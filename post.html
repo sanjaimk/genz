@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report a Waste Area | GenZCleaning</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Post Page Specific Styles */
+    .post-page {
+      max-width: 800px;
+      margin: 80px auto 40px;
+      padding: 20px;
+    }
+    
+    .post-intro {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .post-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 2px solid #e5f5ea;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: #22c55e;
+    }
+    
+    textarea.input {
+      min-height: 120px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    @media (max-width: 768px) {
+      .option-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .option-card {
+      padding: 15px;
+      border: 2px solid #e5f5ea;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .option-card:hover {
+      background: #f8fff9;
+    }
+    
+    .option-card.active {
+      border-color: #22c55e;
+      background: #f0fdf4;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1);
+    }
+    
+    .option-card span {
+      font-size: 24px;
+    }
+    
+    .severity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .severity-item {
+      padding: 15px;
+      border: 2px solid #e5f5ea;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.3s;
+    }
+    
+    .severity-item:hover {
+      background: #f8fff9;
+    }
+    
+    .severity-item.active {
+      border-color: #22c55e;
+      background: #f0fdf4;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1);
+    }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .severity-item.low .dot { background: #22c55e; }
+    .severity-item.medium .dot { background: #f59e0b; }
+    .severity-item.high .dot { background: #f97316; }
+    .severity-item.critical .dot { background: #ef4444; }
+    
+    .severity-item div {
+      flex: 1;
+    }
+    
+    .severity-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .severity-item p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    
+    /* Image Upload */
+    .image-upload-container {
+      position: relative;
+      margin: 15px 0;
+    }
+    
+    .image-preview {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      min-height: 100px;
+    }
+    
+    .preview-image {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #e5f5ea;
+      transition: transform 0.3s;
+    }
+    
+    .preview-image:hover {
+      transform: scale(1.05);
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+    }
+    
+    .image-wrapper:hover .remove-image {
+      display: block;
+    }
+    
+    .image-wrapper {
+      position: relative;
+    }
+    
+    /* Form Cards */
+    .form-card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border: 1px solid #e5f5ea;
+    }
+    
+    .form-card h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #166534;
+    }
+    
+    /* Info Box */
+    .info-box {
+      background: #e8f9ef;
+      border-left: 4px solid #22c55e;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    
+    .info-box strong {
+      color: #166534;
+    }
+    
+    .info-box p {
+      margin: 8px 0 0 0;
+      color: #6b8f7a;
+    }
+    
+    /* Loading and Messages */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      background: #f8fff9;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    
+    .loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5f5ea;
+      border-top: 4px solid #22c55e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .message {
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: none;
+      font-weight: 500;
+    }
+    
+    .message.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+    
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+    
+    .message.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+    
+    /* Custom File Input */
+    .custom-file-input {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-label {
+      display: block;
+      padding: 15px;
+      background: #f8fff9;
+      border: 2px dashed #a7e3bf;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-input-label:hover {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
+    
+    .file-input-label span {
+      color: #22c55e;
+      font-weight: 600;
+    }
+    
+    .file-input-label p {
+      margin: 5px 0 0 0;
+      color: #6b8f7a;
+      font-size: 14px;
+    }
+    
+    #imageFiles {
+      display: none;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+      .post-page {
+        margin: 60px auto 20px;
+        padding: 15px;
+      }
+      
+      .form-card {
+        padding: 20px;
+      }
+      
+      .option-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Form Validation */
+    .input.invalid {
+      border-color: #ef4444;
+    }
+    
+    .error-text {
+      color: #ef4444;
+      font-size: 14px;
+      margin-top: 4px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="header"></header>
+  
+  <!-- PAGE CONTENT -->
+  <main class="page-content post-page">
+    <section class="post-intro fade-up">
+      <div class="post-icon">📸</div>
+      <h1>Report a Waste Area</h1>
+      <p>Help us identify areas that need cleaning. Upload photos, provide details, and let the community join you.</p>
+    </section>
+
+    <!-- SIMPLE FORM -->
+    <form class="post-form" id="postForm">
+      
+      <!-- Title -->
+      <div class="form-card">
+        <h3>Title</h3>
+        <input type="text" id="postTitle" placeholder="Give your report a clear title (e.g., Plastic waste at Marine Drive)" class="input" required>
+        <div class="error-text" id="titleError">Please enter a title</div>
+      </div>
+      
+      <!-- Location -->
+      <div class="form-card">
+        <h3>Location</h3>
+        <input type="text" id="postLocation" placeholder="Enter the location or address" class="input" required>
+        <button type="button" class="btn outline" id="getLocationBtn" style="margin-top: 10px;">📍 Use Current Location</button>
+        <div class="error-text" id="locationError">Please enter a location</div>
+      </div>
+      
+      <!-- Description -->
+      <div class="form-card">
+        <h3>Description</h3>
+        <textarea id="postDescription" placeholder="Describe the waste situation...
+Example:
+- Type of waste (plastic bottles, organic waste, etc.)
+- Approximate quantity
+- Any hazards noticed
+- Accessibility of the area" class="input" rows="4"></textarea>
+        <small style="color: #6b7280; display: block; margin-top: 5px;">Optional but helpful for volunteers</small>
+      </div>
+      
+      <!-- Waste Type -->
+      <div class="form-card">
+        <h3>Type of Waste</h3>
+        <div class="option-grid">
+          <div class="option-card" data-type="plastic">
+            <span>♻️</span>
+            <strong>Plastic</strong>
+          </div>
+          <div class="option-card" data-type="organic">
+            <span>🌿</span>
+            <strong>Organic</strong>
+          </div>
+          <div class="option-card" data-type="mixed">
+            <span>🗑️</span>
+            <strong>Mixed</strong>
+          </div>
+          <div class="option-card" data-type="hazardous">
+            <span>⚠️</span>
+            <strong>Hazardous</strong>
+          </div>
+        </div>
+        <div class="error-text" id="wasteTypeError">Please select waste type</div>
+      </div>
+      
+      <!-- Severity -->
+      <div class="form-card">
+        <h3>Severity Level</h3>
+        <div class="severity-list">
+          <div class="severity-item low" data-severity="low">
+            <span class="dot"></span>
+            <div>
+              <strong>Low</strong>
+              <p>Minor waste accumulation, easy to clean</p>
+            </div>
+          </div>
+          <div class="severity-item medium" data-severity="medium">
+            <span class="dot"></span>
+            <div>
+              <strong>Medium</strong>
+              <p>Moderate cleanup needed, 2-3 volunteers required</p>
+            </div>
+          </div>
+          <div class="severity-item high" data-severity="high">
+            <span class="dot"></span>
+            <div>
+              <strong>High</strong>
+              <p>Significant waste issue, needs team cleanup</p>
+            </div>
+          </div>
+          <div class="severity-item critical" data-severity="critical">
+            <span class="dot"></span>
+            <div>
+              <strong>Critical</strong>
+              <p>Urgent attention required, environmental hazard</p>
+            </div>
+          </div>
+        </div>
+        <div class="error-text" id="severityError">Please select severity level</div>
+      </div>
+      
+      <!-- Image Upload -->
+      <div class="form-card">
+        <h3>📸 Upload Photos (Optional)</h3>
+        <p style="color: #6b7280; margin-bottom: 15px;">Upload up to 5 images. Clear photos help volunteers understand the situation better.</p>
+        
+        <div class="custom-file-input">
+          <label for="imageFiles" class="file-input-label">
+            <span>📁 Choose Images</span>
+            <p>or drag and drop files here</p>
+          </label>
+          <input type="file" id="imageFiles" accept="image/*" multiple class="input" style="display: none;">
+        </div>
+        
+        <!-- Image Preview -->
+        <div class="image-preview" id="imagePreview"></div>
+        
+        <small style="color: #6b8f7a; display: block; margin-top: 10px;">
+          Supported formats: JPG, PNG, GIF, WebP (Max 10MB each)
+        </small>
+      </div>
+      
+      <!-- Info Box -->
+      <div class="info-box fade-up">
+        <strong>ℹ️ What happens next?</strong>
+        <p>Once you submit, your post will appear in the community feed. When 15 volunteers enroll, the cleanup will be automatically scheduled for the next holiday/weekend.</p>
+      </div>
+      
+      <!-- Messages -->
+      <div id="message" class="message"></div>
+      
+      <!-- Loading -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p id="loadingText">Creating post...</p>
+      </div>
+      
+      <!-- Submit -->
+      <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <button type="button" class="btn outline big" onclick="window.location.href='community.html'">
+          ← GoBack
+        </button>
+        <button type="submit" class="btn primary big" style="flex: 1;">
+          📸 Submit Report
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer"></footer>
+
+  <!-- Main Script -->
+  <script type="module">
+    // Import Firebase modules
+    import { auth } from "./js/firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { uploadMultipleImages } from './js/cloudinary.js';
+    
+    // Configuration
+    const CONFIG = {
+      MAX_IMAGES: 5,
+      MAX_FILE_SIZE: 10 * 1024 * 1024 // 10MB
+    };
+    
+    // Global state
+    let selectedWasteType = null;
+    let selectedSeverity = null;
+    let selectedImages = [];
+    let isSubmitting = false;
+    
+    // DOM Elements
+    const postForm = document.getElementById('postForm');
+    const imagePreview = document.getElementById('imagePreview');
+    const imageFilesInput = document.getElementById('imageFiles');
+    const loadingDiv = document.getElementById('loading');
+    const loadingText = document.getElementById('loadingText');
+    const messageDiv = document.getElementById('message');
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Post page initialized');
+      
+      // Check if user is logged in
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          showMessage('⚠️ Please login to create a post', 'error');
+          setTimeout(() => {
+            window.location.href = 'login.html?redirect=post';
+          }, 2000);
+        }
+      });
+      
+      // Setup waste type selection
+      setupWasteTypeSelection();
+      
+      // Setup severity selection
+      setupSeveritySelection();
+      
+      // Setup location button
+      setupLocationButton();
+      
+      // Setup image upload
+      setupImageUpload();
+      
+      // Handle form submission
+      setupFormSubmission();
+    });
+    
+    // Setup waste type selection
+    function setupWasteTypeSelection() {
+      const wasteCards = document.querySelectorAll('.option-card');
+      
+      wasteCards.forEach(card => {
+        card.addEventListener('click', function() {
+          wasteCards.forEach(c => c.classList.remove('active'));
+          this.classList.add('active');
+          selectedWasteType = this.dataset.type;
+          hideError('wasteTypeError');
+        });
+      });
+    }
+    
+    // Setup severity selection
+    function setupSeveritySelection() {
+      const severityItems = document.querySelectorAll('.severity-item');
+      
+      severityItems.forEach(item => {
+        item.addEventListener('click', function() {
+          severityItems.forEach(i => i.classList.remove('active'));
+          this.classList.add('active');
+          selectedSeverity = this.dataset.severity;
+          hideError('severityError');
+        });
+      });
+    }
+    
+    // Setup location button
+    function setupLocationButton() {
+      const locationBtn = document.getElementById('getLocationBtn');
+      const locationInput = document.getElementById('postLocation');
+      
+      locationBtn.addEventListener('click', function() {
+        if (!navigator.geolocation) {
+          showMessage('Geolocation is not supported by your browser', 'error');
+          return;
+        }
+        
+        showMessage('Getting your location...', 'info');
+        locationBtn.disabled = true;
+        locationBtn.textContent = '📍 Getting location...';
+        
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            try {
+              // Try to get address from coordinates
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+              );
+              const data = await response.json();
+              
+              if (data.display_name) {
+                locationInput.value = data.display_name;
+                showMessage('✅ Location found!', 'success');
+              } else {
+                locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                showMessage('✅ Coordinates added', 'success');
+              }
+            } catch (error) {
+              // Fallback to coordinates
+              locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              showMessage('✅ Coordinates added', 'success');
+            }
+            
+            hideError('locationError');
+          },
+          (error) => {
+            console.error('Geolocation error:', error);
+            showMessage('Could not get your location. Please enter manually.', 'error');
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        ).finally(() => {
+          locationBtn.disabled = false;
+          locationBtn.textContent = '📍 Use Current Location';
+        });
+      });
+    }
+    
+    // Setup image upload
+    function setupImageUpload() {
+      // File input change
+      imageFilesInput.addEventListener('change', handleImageSelection);
+      
+      // Drag and drop
+      const dropZone = document.querySelector('.file-input-label');
+      
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.background = '#e8f9ef';
+        dropZone.style.borderColor = '#22c55e';
+      });
+      
+      dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.style.background = '';
+        dropZone.style.borderColor = '';
+      });
+      
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.background = '';
+        dropZone.style.borderColor = '';
+        
+        if (e.dataTransfer.files.length) {
+          imageFilesInput.files = e.dataTransfer.files;
+          handleImageSelection();
+        }
+      });
+    }
+    
+    // Handle image selection
+    function handleImageSelection() {
+      const files = Array.from(imageFilesInput.files);
+      selectedImages = [];
+      
+      // Clear preview
+      imagePreview.innerHTML = '';
+      
+      // Filter and validate images
+      const validFiles = files.slice(0, CONFIG.MAX_IMAGES).filter(file => {
+        const isValid = file.type.startsWith('image/');
+        const isSizeValid = file.size <= CONFIG.MAX_FILE_SIZE;
+        
+        if (!isValid) {
+          showMessage(`Skipped ${file.name}: Not an image file`, 'error');
+        } else if (!isSizeValid) {
+          showMessage(`Skipped ${file.name}: File too large (max 10MB)`, 'error');
+        }
+        
+        return isValid && isSizeValid;
+      });
+      
+      if (validFiles.length === 0 && files.length > 0) {
+        showMessage('No valid images selected. Please select image files under 10MB each.', 'error');
+        return;
+      }
+      
+      // Create previews
+      validFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageWrapper = document.createElement('div');
+          imageWrapper.className = 'image-wrapper';
+          
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'preview-image';
+          img.alt = `Preview ${index + 1}`;
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-image';
+          removeBtn.innerHTML = '×';
+          removeBtn.title = 'Remove image';
+          removeBtn.onclick = () => removeImage(index);
+          
+          imageWrapper.appendChild(img);
+          imageWrapper.appendChild(removeBtn);
+          imagePreview.appendChild(imageWrapper);
+          
+          // Store for upload
+          selectedImages.push({
+            file: file,
+            preview: e.target.result,
+            index: index
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      if (validFiles.length > CONFIG.MAX_IMAGES) {
+        showMessage(`Only first ${CONFIG.MAX_IMAGES} images will be uploaded`, 'info');
+      }
+    }
+    
+    // Remove image from selection
+    function removeImage(index) {
+      selectedImages = selectedImages.filter(img => img.index !== index);
+      
+      // Recreate preview
+      imagePreview.innerHTML = '';
+      selectedImages.forEach((img, newIndex) => {
+        img.index = newIndex;
+        
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'image-wrapper';
+        
+        const imgEl = document.createElement('img');
+        imgEl.src = img.preview;
+        imgEl.className = 'preview-image';
+        imgEl.alt = `Preview ${newIndex + 1}`;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-image';
+        removeBtn.innerHTML = '×';
+        removeBtn.title = 'Remove image';
+        removeBtn.onclick = () => removeImage(newIndex);
+        
+        imageWrapper.appendChild(imgEl);
+        imageWrapper.appendChild(removeBtn);
+        imagePreview.appendChild(imageWrapper);
+      });
+      
+      // Update file input
+      const dataTransfer = new DataTransfer();
+      selectedImages.forEach(img => dataTransfer.items.add(img.file));
+      imageFilesInput.files = dataTransfer.files;
+    }
+    
+    // Setup form submission
+    function setupFormSubmission() {
+      postForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (isSubmitting) return;
+        
+        // Validate form
+        if (!validateForm()) {
+          return;
+        }
+        
+        // Start submission
+        isSubmitting = true;
+        showLoading(true, 'Validating form...');
+        hideMessage();
+        
+        try {
+          // Get form values
+          const postData = {
+            title: document.getElementById('postTitle').value.trim(),
+            location: document.getElementById('postLocation').value.trim(),
+            description: document.getElementById('postDescription').value.trim(),
+            wasteType: selectedWasteType,
+            severity: selectedSeverity
+          };
+          
+          // Step 1: Upload images to Cloudinary
+          let imageUrls = [];
+          if (selectedImages.length > 0) {
+            showLoading(true, 'Uploading images to Cloudinary...');
+            // Extract just the files from selectedImages array
+            const filesToUpload = selectedImages.map(img => img.file);
+            imageUrls = await uploadMultipleImages(filesToUpload);
+          }
+          
+          // Step 2: Create post in Firebase
+          showLoading(true, 'Creating post in database...');
+          const postResult = await createPostInFirebase({
+            ...postData,
+            images: imageUrls
+          });
+          
+          if (postResult.success) {
+            showMessage('🎉 Post created successfully! Redirecting to community...', 'success');
+            
+            // Clear form
+            postForm.reset();
+            selectedImages = [];
+            imagePreview.innerHTML = '';
+            selectedWasteType = null;
+            selectedSeverity = null;
+            document.querySelectorAll('.option-card.active, .severity-item.active')
+              .forEach(el => el.classList.remove('active'));
+            
+            // Redirect after delay
+            setTimeout(() => {
+              window.location.href = 'community.html';
+            }, 2000);
+            
+          } else {
+            throw new Error(postResult.error || 'Failed to create post');
+          }
+          
+        } catch (error) {
+          console.error('Submission error:', error);
+          showMessage(`❌ Error: ${error.message}`, 'error');
+          
+          // If Cloudinary fails but we have previews, offer fallback
+          if (selectedImages.length > 0 && error.message.includes('Cloudinary')) {
+            showMessage('⚠️ Image upload failed. Would you like to continue without images?', 'info');
+            // In a real app, you could add a retry or fallback option here
+          }
+          
+        } finally {
+          isSubmitting = false;
+          showLoading(false);
+        }
+      });
+    }
+    
+    // Validate form
+    function validateForm() {
+      let isValid = true;
+      
+      // Title
+      const title = document.getElementById('postTitle').value.trim();
+      if (!title) {
+        showError('titleError', 'Please enter a title');
+        isValid = false;
+      } else {
+        hideError('titleError');
+      }
+      
+      // Location
+      const location = document.getElementById('postLocation').value.trim();
+      if (!location) {
+        showError('locationError', 'Please enter a location');
+        isValid = false;
+      } else {
+        hideError('locationError');
+      }
+      
+      // Waste Type
+      if (!selectedWasteType) {
+        showError('wasteTypeError', 'Please select waste type');
+        isValid = false;
+      } else {
+        hideError('wasteTypeError');
+      }
+      
+      // Severity
+      if (!selectedSeverity) {
+        showError('severityError', 'Please select severity level');
+        isValid = false;
+      } else {
+        hideError('severityError');
+      }
+      
+      return isValid;
+    }
+    
+    // Create post in Firebase
+    async function createPostInFirebase(postData) {
+      try {
+        // Import the createPost function dynamically
+        const { createPost } = await import('./js/posts.js');
+        
+        const result = await createPost(postData);
+        
+        if (result.success) {
+          console.log('Post created with ID:', result.postId);
+          return { success: true, postId: result.postId };
+        } else {
+          throw new Error(result.error);
+        }
+        
+      } catch (error) {
+        console.error('Firebase post creation error:', error);
+        throw error;
+      }
+    }
+    
+    // UI Helper Functions
+    function showLoading(show, text = 'Processing...') {
+      if (show) {
+        loadingText.textContent = text;
+        loadingDiv.style.display = 'block';
+      } else {
+        loadingDiv.style.display = 'none';
+      }
+    }
+    
+    function showMessage(text, type = 'info') {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+      
+      // Auto-hide non-error messages after 5 seconds
+      if (type !== 'error') {
+        setTimeout(() => {
+          if (messageDiv.textContent === text) {
+            messageDiv.style.display = 'none';
+          }
+        }, 5000);
+      }
+    }
+    
+    function hideMessage() {
+      messageDiv.style.display = 'none';
+    }
+    
+    function showError(elementId, message) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = message;
+        element.style.display = 'block';
+      }
+    }
+    
+    function hideError(elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.style.display = 'none';
+      }
+    }
+    
+    // Make functions available globally if needed
+    window.handleImageSelection = handleImageSelection;
+    window.removeImage = removeImage;
+    
+  </script>
+  <script src="js/config.js"></script>
+  <!-- Layout loader -->
+  <script src="js/layout.js"></script>
+  <!-- Custom GenZcleaning Chat Widget -->
+  <script src="js/chat-widget.js"></script>
+</body>
+</html>

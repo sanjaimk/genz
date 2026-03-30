@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feedback — GenZcleaning</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .feedback-shell { max-width: 1100px; margin: 90px auto 60px; padding: 0 20px; }
+    .feedback-hero {
+      background: linear-gradient(135deg, rgba(34,197,94,.20), rgba(236,254,255,.65));
+      border: 1px solid rgba(34,197,94,.18);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .feedback-hero h1 { margin: 0; color:#14532d; letter-spacing: .2px; }
+    .feedback-hero p { margin: 6px 0 0; color:#4b7c5f; max-width: 700px; line-height: 1.5; }
+    .feedback-hero .badge {
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(20,83,45,.10);
+      padding: 10px 12px;
+      border-radius: 16px;
+      color:#14532d;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .feedback-grid {
+      display:grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .feedback-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(34,197,94,.16);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.05);
+      backdrop-filter: blur(8px);
+    }
+    .panel h2{ margin: 0 0 10px; color:#14532d; font-size: 18px; }
+    .panel p{ margin: 0; color:#6b7280; line-height: 1.55; }
+    .panel ul{ margin: 12px 0 0; padding-left: 18px; color:#4b7c5f; }
+    .panel li{ margin: 6px 0; }
+
+    .feedback-form .row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px){ .feedback-form .row{ grid-template-columns: 1fr; } }
+
+    .form-label{ display:block; font-weight: 700; color:#14532d; margin: 10px 0 6px; }
+    .form-input{
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(255,255,255,.85);
+      outline: none;
+      transition: box-shadow .2s ease, border-color .2s ease;
+      margin: 0;
+    }
+    .form-input:focus{
+      border-color: rgba(34,197,94,.55);
+      box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+    }
+
+    /* Star rating */
+    .stars{
+      display:flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(255,255,255,.85);
+      width: fit-content;
+    }
+    .stars input{ display:none; }
+    .stars label{
+      cursor:pointer;
+      font-size: 22px;
+      line-height: 1;
+      color: #d1d5db;
+      transition: transform .12s ease, color .12s ease;
+      user-select:none;
+    }
+    .stars label:hover{ transform: translateY(-1px) scale(1.05); color:#fbbf24; }
+    .stars input:checked ~ label{ color:#f59e0b; }
+
+    .inline-row{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .pill{
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(255,255,255,.85);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color:#14532d;
+    }
+    .switch{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(255,255,255,.85);
+    }
+    .switch input{ accent-color: #22c55e; }
+
+    .feedback-actions { display:flex; gap:12px; margin-top:14px; align-items:center; flex-wrap: wrap; }
+    .toast-local { position: fixed; top: 20px; right: 20px; background:#14532d; color:#fff; padding:10px 14px; border-radius:10px; z-index:99999; box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+    .success-card{
+      display:none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.22);
+      color:#14532d;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header"></header>
+
+<main class="page-content feedback-shell">
+  <div class="feedback-hero">
+    <div>
+      <h1>Feedback & Reviews</h1>
+      <p>Help us improve GenZcleaning. Report bugs, request features, or share what you love — your feedback goes directly to our admin team.</p>
+    </div>
+    <div class="badge">⏱️ Typical response: 24–48 hours</div>
+  </div>
+
+  <div class="feedback-grid">
+    <section class="panel">
+      <h2>What happens next?</h2>
+      <p>We review every submission and use it to make the app faster, cleaner, and easier to use.</p>
+      <ul>
+        <li><strong>Bug reports</strong> get prioritized and fixed.</li>
+        <li><strong>Feature requests</strong> are tracked for future releases.</li>
+        <li><strong>General feedback</strong> helps us improve UX and clarity.</li>
+      </ul>
+      <div class="inline-row" style="margin-top: 14px;">
+        <div class="pill">🔒 Private: only admins can view</div>
+        <div class="pill">📌 Saved in Firestore</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Submit feedback</h2>
+      <form id="feedbackForm" class="feedback-form">
+        <div class="row">
+          <div>
+            <label class="form-label" for="fbName">Name</label>
+            <input id="fbName" class="form-input" placeholder="Your name (optional)">
+          </div>
+          <div>
+            <label class="form-label" for="fbEmail">Email</label>
+            <input id="fbEmail" class="form-input" type="email" placeholder="you@example.com (optional)">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 8px;">
+          <div>
+            <label class="form-label" for="fbCategory">Category</label>
+            <select id="fbCategory" class="form-input">
+              <option value="general">General</option>
+              <option value="bug">Bug</option>
+              <option value="feature">Feature request</option>
+              <option value="appreciation">Appreciation</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Rating</label>
+            <div class="stars" aria-label="Rating (1 to 5)">
+              <input type="radio" id="star5" name="fbStars" value="5" checked>
+              <label for="star5" title="5 stars">★</label>
+              <input type="radio" id="star4" name="fbStars" value="4">
+              <label for="star4" title="4 stars">★</label>
+              <input type="radio" id="star3" name="fbStars" value="3">
+              <label for="star3" title="3 stars">★</label>
+              <input type="radio" id="star2" name="fbStars" value="2">
+              <label for="star2" title="2 stars">★</label>
+              <input type="radio" id="star1" name="fbStars" value="1">
+              <label for="star1" title="1 star">★</label>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label class="form-label" for="fbMessage">Message</label>
+          <textarea id="fbMessage" class="form-input" rows="6" placeholder="Tell us what happened / what you want improved…"></textarea>
+        </div>
+
+        <div class="inline-row">
+          <div class="switch" title="Would you recommend GenZcleaning?">
+            <input type="checkbox" id="fbRecommend" checked>
+            <label for="fbRecommend" style="margin:0; color:#14532d; font-weight:700; cursor:pointer;">I would recommend GenZcleaning</label>
+          </div>
+        </div>
+
+        <div class="feedback-actions">
+          <button type="submit" id="fbSubmit" class="btn primary" style="width:auto;">Submit</button>
+          <button type="button" id="fbClear" class="btn outline" style="width:auto;">Clear</button>
+          <span style="color:#6b7280; font-size: 13px;">Tip: include the page name and steps to reproduce for bugs.</span>
+        </div>
+
+        <div class="success-card" id="fbSuccess">✅ Thanks! Your feedback was submitted.</div>
+      </form>
+    </section>
+  </div>
+</main>
+
+<div id="toastRoot"></div>
+
+<div id="footer"></div>
+
+<script src="js/layout.js"></script>
+<script type="module">
+  import { db, auth } from './js/firebase.js';
+  import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  const form = document.getElementById('feedbackForm');
+  const nameEl = document.getElementById('fbName');
+  const emailEl = document.getElementById('fbEmail');
+  const msgEl = document.getElementById('fbMessage');
+  const categoryEl = document.getElementById('fbCategory');
+  const recommendEl = document.getElementById('fbRecommend');
+  const submitBtn = document.getElementById('fbSubmit');
+  const clearBtn = document.getElementById('fbClear');
+  const successCard = document.getElementById('fbSuccess');
+
+  function showToast(msg, timeout=3000){
+    const root = document.getElementById('toastRoot');
+    const t = document.createElement('div');
+    t.className = 'toast-local'; t.textContent = msg; root.appendChild(t);
+    setTimeout(()=>{ t.style.opacity=0; setTimeout(()=>t.remove(),400); }, timeout);
+  }
+
+  function getSelectedRating() {
+    const checked = document.querySelector('input[name="fbStars"]:checked');
+    const v = parseInt(checked?.value || '5', 10);
+    return isNaN(v) ? 5 : v;
+  }
+
+  // Prefill if logged in
+  auth.onAuthStateChanged((user) => {
+    if (!user) return;
+    if (!nameEl.value) nameEl.value = user.displayName || '';
+    if (!emailEl.value) emailEl.value = user.email || '';
+  });
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const message = msgEl.value.trim();
+    if (!message) { showToast('Please enter a message'); return; }
+    submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
+    if (successCard) successCard.style.display = 'none';
+
+    try {
+      const rating = getSelectedRating();
+      const payload = {
+        name: nameEl.value.trim() || null,
+        email: emailEl.value.trim() || null,
+        message,
+        rating,
+        category: (categoryEl?.value || 'general'),
+        recommend: !!recommendEl?.checked,
+        page: window.location.pathname,
+        userAgent: navigator.userAgent,
+        createdAt: serverTimestamp(),
+        uid: auth?.currentUser?.uid || null
+      };
+
+      await addDoc(collection(db, 'feedback'), payload);
+      showToast('Thanks — your feedback was submitted!');
+      if (successCard) successCard.style.display = 'block';
+      form.reset();
+      // restore defaults after reset
+      document.getElementById('star5')?.click();
+      if (recommendEl) recommendEl.checked = true;
+    } catch (err) {
+      console.error('Feedback save failed', err);
+      showToast('Failed to submit feedback. Please try again.');
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = 'Submit Feedback';
+    }
+  });
+
+  clearBtn.addEventListener('click', ()=> {
+    form.reset();
+    document.getElementById('star5')?.click();
+    if (recommendEl) recommendEl.checked = true;
+    if (successCard) successCard.style.display = 'none';
+  });
+</script>
+<!-- Custom GenZcleaning Chat Widget -->
+<script src="js/chat-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verified Cleanups | GenZcleaning</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page { max-width:1100px; margin:40px auto; padding:20px; }
+    .grid { display:grid; grid-template-columns:1fr; gap:18px; }
+    @media(min-width:768px){ .grid{ grid-template-columns: repeat(2,1fr);} }
+    @media(min-width:1200px){ .grid{ grid-template-columns: repeat(3,1fr);} }
+    .card{ background:white; border-radius:12px; padding:12px; box-shadow:0 8px 30px rgba(0,0,0,0.06);} 
+    .card img{ width:100%; height:200px; object-fit:cover; border-radius:8px; }
+
+    /* Before/After slider styles - fixed */
+    .ba-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      user-select: none;
+      cursor: col-resize;
+    }
+    .ba-before, .ba-after {
+      display: block;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      pointer-events: none; /* allow dragging through */
+    }
+    .ba-after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .ba-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 999px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: ew-resize;
+      border: 2px solid #16a34a;
+      transition: box-shadow 0.1s;
+      pointer-events: auto;
+    }
+    .ba-handle::after {
+      content: '';
+      width: 6px;
+      height: 24px;
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      border-radius: 6px;
+    }
+    .ba-handle:active {
+      box-shadow: 0 6px 20px rgba(22,163,74,0.4);
+    }
+    .ba-range {
+      width: 100%;
+      margin-top: 12px;
+      accent-color: #16a34a;
+      cursor: pointer;
+    }
+    .ba-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .ba-meta .label {
+      background: #f0fdf4;
+      color: #14532d;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #6b8f7a;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Verified Cleanup Projects</h1>
+    <p style="color:#6b8f7a;">Browse verified before/after cleanup photos submitted and approved by admins.</p>
+
+    <section id="list" class="grid">
+      <div class="loading">Loading...</div>
+    </section>
+
+    <br>
+    <a href="community.html" class="btn outline">← Back to Community</a>
+  </main>
+
+  <script type="module">
+    import { fetchApprovedCleanups } from './js/posts.js';
+
+    async function render() {
+      const container = document.getElementById('list');
+      try {
+        const posts = await fetchApprovedCleanups();
+        if (!posts || posts.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>No verified cleanups yet.</p></div>';
+          return;
+        }
+
+        container.innerHTML = posts.map((p, idx) => {
+          const before = p.cleanupProof?.beforeImage || (p.images && p.images[0]) || '';
+          const after = p.cleanupProof?.afterImage || '';
+          const cardId = 'ba-' + Date.now() + '-' + idx + '-' + (p.id ? p.id.slice(0,5) : 'rand');
+
+          // fallback images
+          const beforeSrc = before || 'assets/drive1.jpg';
+          const afterSrc = after || before || 'assets/drive1.jpg';
+
+          return `
+            <div class="card" id="${cardId}">
+              <div class="ba-wrapper" data-card-id="${cardId}">
+                <img class="ba-before" src="${beforeSrc}" alt="Before cleanup" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.src='assets/drive1.jpg'">
+                <div class="ba-after" style="width:50%">
+                  <img src="${afterSrc}" alt="After cleanup" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.src='assets/drive1.jpg'" style="width:100%; height:200px; object-fit:cover; display:block;">
+                </div>
+                <div class="ba-handle" draggable="false" aria-hidden="true"></div>
+              </div>
+
+              <h3 style="margin-top:12px">${p.title || 'Cleanup'}</h3>
+              <p style="color:#6b8f7a; margin:6px 0;">${p.location || ''}</p>
+              <div class="ba-meta">
+                <div class="label">After</div>
+                <div style="flex:1"></div>
+                <div class="label">Before</div>
+              </div>
+              <input class="ba-range" type="range" min="0" max="100" value="50" data-card-id="${cardId}" aria-label="Compare before and after">
+            </div>
+          `;
+        }).join('');
+
+        // Initialize all sliders
+        initSliders();
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div class="empty-state"><p>Failed to load cleanups.</p></div>';
+      }
+    }
+
+    function initSliders() {
+      document.querySelectorAll('.card').forEach(card => {
+        const wrapper = card.querySelector('.ba-wrapper');
+        const afterDiv = card.querySelector('.ba-after');
+        const handle = card.querySelector('.ba-handle');
+        const range = card.querySelector('.ba-range');
+        if (!wrapper || !afterDiv || !handle || !range) return;
+
+        // Set initial position from range value
+        const setPosition = (percent) => {
+          percent = Math.max(0, Math.min(100, percent));
+          afterDiv.style.width = percent + '%';
+          handle.style.left = percent + '%';
+        };
+
+        // Initialize with 50%
+        setPosition(50);
+        range.value = 50;
+
+        // Handle range input
+        range.addEventListener('input', (e) => {
+          setPosition(e.target.value);
+        });
+
+        // Dragging with mouse/touch
+        let isDragging = false;
+
+        const onPointerDown = (e) => {
+          e.preventDefault();
+          isDragging = true;
+          handle.setPointerCapture?.(e.pointerId);
+        };
+
+        const onPointerUp = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          handle.releasePointerCapture?.(e.pointerId);
+        };
+
+        const onPointerMove = (e) => {
+          if (!isDragging) return;
+          e.preventDefault();
+
+          const rect = wrapper.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          let x = clientX - rect.left;
+          x = Math.max(0, Math.min(rect.width, x));
+          const percent = (x / rect.width) * 100;
+
+          setPosition(percent);
+          range.value = Math.round(percent);
+        };
+
+        // Attach pointer events to handle (for precision)
+        handle.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointermove', onPointerMove);
+
+        // Also allow dragging on wrapper (for easier grabbing)
+        wrapper.addEventListener('pointerdown', (e) => {
+          // if clicking directly on wrapper, move handle to that point and start drag
+          const rect = wrapper.getBoundingClientRect();
+          const clientX = e.clientX;
+          let x = clientX - rect.left;
+          x = Math.max(0, Math.min(rect.width, x));
+          const percent = (x / rect.width) * 100;
+          setPosition(percent);
+          range.value = Math.round(percent);
+          // start dragging
+          isDragging = true;
+          handle.setPointerCapture?.(e.pointerId);
+        });
+
+        // Touch support (passive: false to prevent scroll while dragging)
+        wrapper.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          const rect = wrapper.getBoundingClientRect();
+          const clientX = e.touches[0].clientX;
+          let x = clientX - rect.left;
+          x = Math.max(0, Math.min(rect.width, x));
+          const percent = (x / rect.width) * 100;
+          setPosition(percent);
+          range.value = Math.round(percent);
+          isDragging = true;
+        }, { passive: false });
+
+        wrapper.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          e.preventDefault();
+          const rect = wrapper.getBoundingClientRect();
+          const clientX = e.touches[0].clientX;
+          let x = clientX - rect.left;
+          x = Math.max(0, Math.min(rect.width, x));
+          const percent = (x / rect.width) * 100;
+          setPosition(percent);
+          range.value = Math.round(percent);
+        }, { passive: false });
+
+        wrapper.addEventListener('touchend', () => {
+          isDragging = false;
+        });
+
+        // Cleanup on card removal (optional, but good practice)
+        // Not needed for static page.
+      });
+    }
+
+    // Fallback for images blocked by CORS/tracking prevention
+    async function fetchImageFallback(img) {
+      try {
+        const url = img.getAttribute('data-src') || img.src;
+        if (!url || url.includes('assets/')) return;
+        // Try direct CORS fetch
+        try {
+          const res = await fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit' });
+          if (res.ok) {
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            img.src = objectUrl;
+            delete img.dataset.failed;
+            return;
+          }
+        } catch (directErr) {
+          console.warn('Direct fetch failed, trying proxy:', directErr);
+          // Try proxy if available (adjust URL to your proxy endpoint)
+          try {
+            const proxyUrl = '/img-proxy?u=' + encodeURIComponent(url);
+            const pres = await fetch(proxyUrl);
+            if (pres.ok) {
+              const blob = await pres.blob();
+              img.src = URL.createObjectURL(blob);
+              delete img.dataset.failed;
+              return;
+            }
+          } catch (proxyErr) {
+            console.warn('Proxy fetch failed', proxyErr);
+          }
+        }
+      } catch (err) {
+        console.warn('Fallback failed', err);
+      }
+    }
+
+    // After content renders, try fallback for images that failed
+    document.addEventListener('DOMContentLoaded', () => {
+      render();
+
+      // Also attempt fallback after a delay (for images that might have failed)
+      setTimeout(() => {
+        document.querySelectorAll('img[onerror]').forEach(img => {
+          if (img.dataset.failed === '1' || img.naturalWidth === 0) {
+            fetchImageFallback(img);
+          }
+        });
+      }, 500);
+    });
+  </script>
+</body>
+</html>

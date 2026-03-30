@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | GenZcleaning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+
+<body>
+  <header id="header"></header>
+  
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-logo">🍃</div>
+      
+      <h2 class="mb-2">Welcome Back</h2>
+      <p class="mb-4">Sign in to continue your eco-journey</p>
+
+      <!-- Login Form -->
+      <form onsubmit="handleLogin(event)" class="mb-3">
+        <div class="form-group mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="Enter your email" 
+            required
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            id="password" 
+            type="password" 
+            placeholder="Enter your password" 
+            required
+            class="form-control"
+          />
+        </div>
+
+        <div class="flex-between mb-3">
+          <label class="flex gap-1">
+            <input type="checkbox" name="remember">
+            <span class="text-sm">Remember me</span>
+          </label>
+          <a href="#" class="text-sm text-primary">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn primary block mb-3" onclick="login()">
+          Sign In
+        </button>
+      </form>
+
+      <div class="divider">or continue with</div>
+
+      <button class="btn outline block mb-3" onclick="googleLogin()">
+        <span>🔵</span> Continue with Google
+      </button>
+
+      <p class="text-center text-sm">
+        Don't have an account?
+        <a href="signup.html" class="font-weight-600">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+<script src="js/layout.js"></script>
+<script type="module" src="js/firebase.js"></script>
+<script type="module">
+  import { auth } from './js/firebase.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // If user is already logged in, redirect to dashboard
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User already logged in, redirecting to dashboard");
+      window.location.href = 'dashboard.html';
+    }
+  });
+</script>
+<script type="module" src="js/login.js"></script>
+<script src="js/config.js"></script>
+<!-- Custom GenZcleaning Chat Widget -->
+<script src="js/chat-widget.js"></script>
+</body>
+<style>
+    /* =========================
+   LOGIN MOBILE FIX (FOR REAL)
+   ========================= */
+
+@media (max-width: 768px) {
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  header {
+    position: relative !important;
+  }
+
+  .auth-wrapper {
+    min-height: auto !important;
+    padding: 24px 14px !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+
+  .auth-card {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    padding: 26px 20px !important;
+    border-radius: 18px;
+  }
+
+  .auth-card h2 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .auth-card p {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  input {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .btn.primary,
+  .btn.outline {
+    width: 100%;
+    height: 46px;
+    font-size: 15px;
+  }
+}
+@media (max-width: 480px) {
+
+  .auth-card {
+    padding: 22px 16px !important;
+  }
+
+  .auth-card h2 {
+    font-size: 20px;
+  }
+
+  .auth-card p {
+    font-size: 13px;
+  }
+
+  input {
+    font-size: 13.5px;
+  }
+
+  .btn.primary {
+    height: 44px;
+  }
+}
+
+</style>
+<script>
+  window.addEventListener("scroll", () => {
+    document
+      .querySelector(".site-header")
+      .classList.toggle("scrolled", window.scrollY > 10);
+  });
+</script>
+</html>

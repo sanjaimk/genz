@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | GenZCleaning</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Image preloading for dashboard -->
+  <link rel="preload" as="image" href="assets/logo.png" type="image/png">
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="header"></header>
+  
+  <main class="dashboard-container">
+    
+    <!-- SIDEBAR PROFILE SECTION -->
+    <aside class="dashboard-sidebar slide-in-right">
+      <!-- PROFILE CARD -->
+      <section class="profile-card">
+        <div class="profile-avatar-wrapper">
+          <img id="user-avatar" src="https://i.pravatar.cc/150?img=12" alt="User" class="profile-avatar" />
+        </div>
+
+        <h2 id="user-name" class="profile-name">
+          Loading...
+        </h2>
+        <span class="tag primary" id="user-role">Volunteer</span>
+
+        <p class="profile-location" id="user-meta">
+          📍 Loading location...
+        </p>
+
+        <div class="profile-stats-grid">
+          <div class="stat-item bounce-in" style="animation-delay: 0.1s;">
+            <div class="stat-value" id="user-points">0</div>
+            <div class="stat-label">Points</div>
+          </div>
+          <div class="stat-item bounce-in" style="animation-delay: 0.2s;">
+            <div class="stat-value" id="user-badges-count">0</div>
+            <div class="stat-label">Badges</div>
+          </div>
+          <div class="stat-item bounce-in" style="animation-delay: 0.3s;">
+            <div class="stat-value" id="user-cleanups-count">0</div>
+            <div class="stat-label">Cleanups</div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <a href="#cleanups" class="btn primary block small-btn">📅 Cleanups</a>
+          <a href="#certs" class="btn outline block small-btn">📜 Certificates</a>
+          <button class="btn ghost block small-btn" id="settings-btn">⚙️ Settings</button>
+        </div>
+      </section>
+
+      <!-- QUICK STATS CARD -->
+      <section class="quick-stats-card slide-in-right" style="animation-delay: 0.2s;">
+        <h4 class="quick-stats-title">Your Progress</h4>
+        
+        <div class="progress-item">
+          <label>Level 5</label>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 65%;"></div>
+          </div>
+          <span class="progress-text">650/1000 XP</span>
+        </div>
+
+      </section>
+    </aside>
+
+    <!-- MAIN CONTENT SECTION -->
+    <section class="dashboard-content">
+      
+      <!-- WELCOME BANNER -->
+      <div class="welcome-banner slide-in-down">
+        <div class="banner-content">
+          <h1>Welcome back! 👋</h1>
+          <p id="user-greeting">Ready to make an impact today?</p>
+        </div>
+        <button class="btn primary" onclick="document.location.href='community.html'">
+          Start a Cleanup 🌱
+        </button>
+      </div>
+
+      <!-- GRID LAYOUT -->
+      <div class="dashboard-grid-main">
+        
+        <!-- TOP 5 CLEANERS (leaderboard) - FULL WIDTH -->
+        <section class="card card-leaderboard bounce-in" style="animation-delay: 0.15s;">
+          <div class="card-header-premium">
+            <div class="header-badge">🏆</div>
+            <div class="header-content">
+              <h3>Top 5 Cleaners</h3>
+              <p>Volunteers with the most badges this month</p>
+            </div>
+          </div>
+          <div class="leaderboard-list" id="topCleanersList">
+            <div class="loading">Loading...</div>
+          </div>
+        </section>
+
+        <!-- BADGES SECTION -->
+        <section class="card card-badges bounce-in" style="animation-delay: 0.25s;">
+          <div class="card-header-premium">
+            <div class="header-badge">🏅</div>
+            <div class="header-content">
+              <h3>Your Badges</h3>
+            </div>
+          </div>
+          <div class="badge-grid-modern" id="badges-container">
+            <div class="loading">Loading badges...</div>
+          </div>
+        </section>
+
+        <!-- CERTIFICATES SECTION -->
+        <section class="card card-certificates bounce-in" style="animation-delay: 0.35s;" id="certs">
+          <div class="card-header-premium">
+            <div class="header-badge">📜</div>
+            <div class="header-content">
+              <h3>Certificates</h3>
+              <a href="certificates.html" class="header-link">View All →</a>
+            </div>
+          </div>
+          <div class="card-body-list" id="user-certificates-list">
+            <div class="loading">Loading certificates...</div>
+          </div>
+        </section>
+
+        <!-- ENROLLED CLEANUPS SECTION -->
+        <section class="card card-cleanups bounce-in" style="animation-delay: 0.45s;" id="cleanups">
+          <div class="card-header-premium">
+            <div class="header-badge">📅</div>
+            <div class="header-content">
+              <h3>Enrolled Cleanups</h3>
+              <a href="cleanups.html" class="header-link">View All →</a>
+            </div>
+          </div>
+          <div class="card-body-list" id="enrolled-cleanups-list">
+            <div class="loading">Loading cleanups...</div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ACCOUNT ACTIONS -->
+      <section class="account-actions">
+        <h3>Account Settings</h3>
+        <div class="action-buttons">
+          <button class="btn secondary" onclick="window.location.href='settings.html'">
+            ⚙️ Manage Settings
+          </button>
+          <button id="logoutDashboardBtn" class="btn danger" onclick="window.handleDashboardLogout()">
+            🚪 Logout
+          </button>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer"></footer>
+
+  <!-- Scripts -->
+  <script src="js/layout.js" defer></script>
+  <script type="module" defer>
+    import { initDashboard } from './js/dashboard-data.js';
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initDashboard();
+      document.getElementById('settings-btn')?.addEventListener('click', () => {
+        window.location.href = 'settings.html';
+      });
+    });
+  </script>
+  <script>
+    window.handleDashboardLogout = async function() {
+      try {
+        if (window.firebaseAuth) {
+          await window.firebaseAuth.signOut();
+        }
+        window.location.href = 'index.html';
+      } catch (error) {
+        console.error('Logout error:', error);
+        alert('Error logging out: ' + error.message);
+      }
+    };
+  </script>
+  <script src="js/chat-widget.js"></script>
+</body>
+</html>

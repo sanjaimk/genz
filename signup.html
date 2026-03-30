@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Join GenZcleaning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ===== HARD HEADER RESET (FIXES EVERYTHING) ===== */
+.site-header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  background: #f9fff9;
+  border-bottom: 1px solid #e5f5ea;
+  z-index: 9999;
+}
+
+/* Push page content down so header doesn't overlap */
+
+body {
+  display: block;
+}
+
+
+
+  </style>
+</head>
+<body class="auth-page">
+  <header id="header"></header>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-logo">🌱</div>
+      
+      <h2 class="mb-2">Join GenZcleaning</h2>
+      <p class="mb-4">Create your account and start making an impact</p>
+
+      <!-- Progress Indicator -->
+      <div class="steps mb-4" id="progressIndicator">
+        <span class="step active" id="dot1"></span>
+        <span class="step" id="dot2"></span>
+      </div>
+
+      <!-- STEP 1: Role Selection -->
+      <div id="step1">
+        <h4 class="mb-3">Select Your Role</h4>
+
+        <div class="role active mb-3" onclick="selectRole('Volunteer', this)">
+          <span>👥</span>
+          <div>
+            <strong>Volunteer</strong>
+            <small>Join cleanups and earn badges</small>
+          </div>
+        </div>
+
+        <div class="role mb-4" onclick="selectRole('Organizer', this)">
+          <span>👑</span>
+          <div>
+            <strong>Organizer</strong>
+            <small>Lead drives and manage teams</small>
+          </div>
+        </div>
+
+        <button class="btn primary block mb-3" onclick="goStep2()">
+          Continue
+        </button>
+
+        <div class="divider">or continue with</div>
+        
+        <button class="btn outline block mb-3" onclick="googleSignup()">
+          <span>🔵</span> Continue with Google
+        </button>
+
+        <p class="text-center text-sm">
+          Already have an account? <a href="login.html" class="font-weight-600">Sign in</a>
+        </p>
+      </div>
+
+      <!-- STEP 2: Account Details -->
+      <div id="step2" style="display: none;">
+        <form onsubmit="handleSignup(event)">
+          <div class="form-group mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input id="name" type="text" placeholder="Enter your full name" required class="form-control">
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input id="email" type="email" placeholder="Enter your email" required class="form-control">
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" type="password" placeholder="Create a password" required class="form-control">
+          </div>
+
+          <div class="form-group mb-4">
+            <label for="location" class="form-label">City, State</label>
+            <input id="location" type="text" placeholder="Where are you located?" required class="form-control">
+          </div>
+
+          <div class="flex gap-2 mb-3">
+            <button type="button" class="btn secondary flex-1" onclick="goStep1()">Back</button>
+            <button type="submit" class="btn primary flex-1" onclick="signup()">Create Account</button>
+          </div>
+
+          <div class="divider">or continue with</div>
+          
+          <button type="button" class="btn outline block mb-3" onclick="googleSignup()">
+            <span>🔵</span> Continue with Google
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+<script src="js/layout.js"></script>
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/app.js"></script>
+<script>
+  window.addEventListener("scroll", () => {
+    document
+      .querySelector(".site-header")
+      .classList.toggle("scrolled", window.scrollY > 10);
+  });
+</script>
+<script src="js/config.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ======================
+       HELPERS
+    ====================== */
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin"
+        ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+        );
+    }
+
+    /* ======================
+       USERS
+    ====================== */
+    match /users/{userId} {
+
+      // Logged-in users can read users (for profile, admin list, etc.)
+      allow read: if isLoggedIn();
+
+      // Create own user document
+      allow create: if isLoggedIn() && request.auth.uid == userId;
+
+      // User can update ONLY safe profile fields
+      allow update: if isLoggedIn() &&
+        request.auth.uid == userId &&
+        request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly([
+            "name",
+            "email",
+            "phone",
+            "photoURL",
+            "address"
+          ]);
+
+      // Admin full access
+      allow update, delete: if isAdmin();
+    }
+
+    /* ======================
+       POSTS (COMMUNITY)
+    ====================== */
+    match /posts/{postId} {
+
+      // Anyone can view posts
+      allow read: if true;
+
+      // Logged-in users can create posts
+      allow create: if isLoggedIn();
+
+      // UPDATE RULES
+      allow update: if isLoggedIn() && (
+        
+        // Admin can update anything
+        isAdmin()
+
+        ||
+
+        // LIKE / UNLIKE
+        request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly([
+            "likes",
+            "likedBy",
+            "likeCount"
+          ])
+
+        ||
+
+        // VOLUNTEER ENROLL LOGIC
+        (
+          request.resource.data.enrolledUsers.size() ==
+          resource.data.enrolledUsers.size() + 1
+          &&
+          request.resource.data.enrolledCount ==
+          resource.data.enrolledCount + 1
+          &&
+          request.resource.data.status ==
+          resource.data.status
+        )
+      );
+
+      // Only admin can delete posts
+      allow delete: if isAdmin();
+    }
+
+    /* ======================
+       NOTIFICATIONS
+    ====================== */
+    match /notifications/{notificationId} {
+
+      // Create notification (admin)
+      allow create: if isAdmin() || isLoggedIn();
+
+      // User can read their own notifications
+      allow read: if isLoggedIn() && 
+        resource.data.userId == request.auth.uid;
+
+      // User can update/delete their own notifications
+      allow update, delete: if isLoggedIn() && 
+        resource.data.userId == request.auth.uid;
+    }
+
+    /* ======================
+       ADMIN SETTINGS
+    ====================== */
+    match /admin/{docId} {
+      // Admin-only settings (sensitive)
+      allow read, write: if isAdmin();
+    }
+
+    /* ======================
+       PUBLIC SETTINGS
+       (Admins may publish a copy here for public reads)
+    ====================== */
+    match /public/{docId} {
+      // Publicly readable settings (e.g. platform stats)
+      allow read: if true;
+      // Only admins may write the public copy
+      allow write: if isAdmin();
+    }
+
+    /* ======================
+       CERTIFICATES
+    ====================== */
+    match /certificates/{certId} {
+
+      // User can read their own certificate
+      allow read: if isLoggedIn() &&
+        request.auth.uid == resource.data.userId;
+
+      // Admin can create/update certificates
+      allow create, update: if isAdmin();
+    }
+
+    /* ======================
+       FEEDBACK
+    ====================== */
+    match /feedback/{feedbackId} {
+
+      // Anyone can submit feedback
+      allow create: if true;
+
+      // Only admin can read feedback
+      allow read: if isAdmin();
+
+      // Only admin can update feedback
+      allow update, delete: if isAdmin();
+    }
+  }
+}

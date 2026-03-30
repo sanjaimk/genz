@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GenZcleaning - Community-driven environmental cleanup platform. Join volunteers, earn badges, and make a positive impact." />
+  <meta name="theme-color" content="#10b981" />
+  <title>GenZcleaning | Community Cleanup Platform</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Image preloading for faster FCP -->
+  <link rel="preload" as="image" href="assets/logo.png" type="image/png">
+  <link rel="preload" as="image" href="assets/step1.png" type="image/png">
+  <link rel="preload" as="image" href="assets/step2.png" type="image/png">
+  <link rel="preload" as="image" href="assets/step3.png" type="image/png">
+  <link rel="preload" as="image" href="assets/step4.png" type="image/png">
+  <link rel="preload" as="image" href="assets/drive1.jpg" type="image/jpeg">
+  <style>
+    /* Keep your existing styles */
+    .drives {
+      padding: 80px 8%;
+    }
+
+    .drives-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    /* View All Drives button */
+    .drives-header .outline-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 24px;
+      background: transparent;
+      border: 2px solid #16a34a;
+      color: #16a34a;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .drives-header .outline-btn:hover {
+      background: #dcfce7;
+      color: #166534;
+      transform: translateY(-2px);
+    }
+
+    #step{
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .badge {
+      background: #e8f9ef;
+      color: #16a34a;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    /* Active drives: horizontal scroll row */
+    .drive-grid {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 24px;
+      padding-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+
+    .drive-card {
+      flex: 0 0 auto;
+      min-width: 280px;
+      max-width: 320px;
+      scroll-snap-align: start;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,.08);
+      transition: transform .3s ease;
+    }
+
+    .drive-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .drive-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .drive-card h3 {
+      padding: 16px 18px 4px;
+    }
+
+    .location {
+      padding: 0 18px;
+      color: #6b8f7a;
+      font-size: 14px;
+    }
+
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 18px 6px;
+    }
+
+    .bar {
+      height: 6px;
+      background: #e5f5ea;
+      margin: 0 18px 16px;
+      border-radius: 10px;
+    }
+
+    .bar div {
+      height: 100%;
+      background: linear-gradient(90deg,#22c55e,#4ade80);
+      border-radius: 10px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      margin: 0 18px 20px;
+      width: calc(100% - 36px);
+      padding: 12px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .primary-btn {
+      background: #22c55e;
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #16a34a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .primary-btn:active {
+      transform: translateY(0);
+    }
+
+    .secondary-btn {
+      background: #a7e3bf;
+    }
+
+    .secondary-btn:hover {
+      background: #86efac;
+      transform: translateY(-2px);
+    }
+
+    /* ===== IMPACT ===== */
+    .impact {
+      padding: 100px 8%;
+      background: linear-gradient(135deg,#16a34a,#4ade80);
+      color: white;
+      text-align: center;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    .impact-card {
+      background: rgba(255,255,255,.15);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease;
+    }
+
+    .impact-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .impact-card h3 {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:900px){
+      .drive-grid,
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #e5f5ea;
+      border-top: 5px solid #22c55e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 10px;
+      color: white;
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.success {
+      background: #22c55e;
+    }
+
+    .toast.error {
+      background: #ef4444;
+    }
+
+    .toast.info {
+      background: #3b82f6;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Enrollment modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    /* Animated button */
+    .btn.primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn.outline:active {
+      transform: scale(0.98);
+    }
+    
+    /* ===== MOBILE ENHANCEMENTS (<=600px) ===== */
+    @media (max-width: 600px) {
+      /* Reduce overall hero padding and tighten layout */
+      .hero { padding: 36px 16px; }
+      .hero-content { padding: 18px; }
+
+      .hero-content h1 {
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      .hero-content p { font-size: 14px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+
+      /* Stack CTA buttons and make them full width */
+      .hero-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+      .hero-buttons .btn { width: 100%; padding: 12px 14px; font-size: 15px; }
+
+      /* Reduce pill / metrics size */
+      .pill { font-size: 12px; padding: 6px 10px; }
+      .hero-metrics { display: flex; gap: 8px; font-size: 13px; margin-top: 12px; }
+
+      /* Drives: keep horizontal scroll on mobile */
+      .drives { padding: 24px 6%; }
+      .drive-grid { gap: 18px; }
+      .drive-card { min-width: 260px; border-radius: 14px; }
+
+      /* Search & filters full width */
+      .hero .btn.outline, .hero .btn.primary { box-shadow: none; }
+
+      /* Keep brand text visible on mobile */
+      .logo-text { display: inline-block; }
+      @media (max-width: 420px) {
+        .logo-text { display: inline-block; font-size: 13px; }
+        .hero-content h1 { font-size: 24px; }
+        .hero-content p { font-size: 13px; color: #fff; }
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header id="header"></header>
+
+<main class="page-content">
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-content fade-up">
+    <span class="pill">Join 10,000+ volunteers across India</span>
+
+    <h1>Clean Streets,<br>Green Future</h1>
+
+    <p>
+      Spot waste-affected areas, rally volunteers, and organize
+      community cleanups. Together, we're building a cleaner India.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="signup.html" class="btn primary">Join as Volunteer →</a>
+      <a href="post.html" class="btn outline">📍 Report Waste Area</a>
+    </div>
+
+    <div class="hero-metrics">
+      <div><strong id="areasCleaned">500+</strong><span>Areas Cleaned</span></div>
+      <div><strong id="totalVolunteers">10K+</strong><span>Volunteers</span></div>
+      <div><strong id="eventsDone">200+</strong><span>Events Done</span></div>
+    </div>
+  </div>
+</section>
+<br><br>
+<!-- ================= HOW IT WORKS ================= -->
+<section class="how">
+  <span class="pill light">How It Works</span><br><br>
+  <h2>From Spotting to Sparkling</h2>
+  <p>Four simple steps to transform waste areas.</p>
+
+  <div class="how-grid">
+    <div class="how-card fade-up">
+      <span class="step">1</span>
+      <h3>Spot & Report</h3>
+      <p>Upload waste photos with location & severity.</p>
+      <img id="step" src="assets/step1.png" alt="Spot & Report" loading="eager" fetchpriority="high" />
+    </div>
+
+    <div class="how-card fade-up">
+      <span class="step">2</span>
+      <h3>Rally Volunteers</h3>
+      <p>Community members enroll & coordinate.</p>
+      <img id="step" src="assets/step2.png" alt="Rally Volunteers" loading="eager" />
+    </div>
+
+    <div class="how-card fade-up">
+      <span class="step">3</span>
+      <h3>Auto Schedule</h3>
+      <p>Cleanup scheduled once enough volunteers join.</p>
+      <img id="step" src="assets/step3.png" alt="Auto Schedule" loading="eager" />
+    </div>
+
+    <div class="how-card fade-up">
+      <span class="step">4</span>
+      <h3>Clean Together</h3>
+      <p>Show up, clean up & earn badges.</p>
+      <br>
+      <img id="step" src="assets/step4.png" alt="Clean Together" loading="eager" />
+    </div>
+  </div>
+</section>
+
+<!-- ================= IMPACT ================= -->
+<section class="impact">
+  <span class="pill light">Our Impact</span>
+  <h2>Numbers That Matter</h2>
+  <p>Every statistic represents real community effort.</p>
+
+  <div class="impact-grid">
+    <div class="impact-card">
+      <h3 id="homeWasteCount">0</h3>
+      <p>Kg Waste Collected</p>
+    </div>
+    <div class="impact-card">
+      <h3 id="homeVolunteersCount">0</h3>
+      <p>Active Volunteers</p>
+    </div>
+    <div class="impact-card">
+      <h3 id="homeAreasCount">0</h3>
+      <p>Areas Cleaned</p>
+    </div>
+    <div class="impact-card">
+      <h3 id="homeCitiesCount">0</h3>
+      <p>Cities Covered</p>
+    </div>
+  </div>
+</section>
+
+  <!-- ACTIVE DRIVES -->
+  <section class="drives">
+    <div class="drives-header">
+      <div>
+        <span class="badge">Active Drives</span>
+        <h2>Join a Cleanup Near You</h2>
+        <p>Enroll in upcoming drives or view completed cleanups in your area.</p>
+      </div>
+      <button id="viewAllDrivesBtn" class="outline-btn">View All Drives →</button>
+    </div>
+
+    <div class="drive-grid" id="drivesContainer">
+      <!-- Drives will be loaded dynamically -->
+      <div class="loading-text">Loading drives...</div>
+    </div>
+  </section>
+
+<!-- ================= CTA STRIP ================= -->
+<section class="cta-strip fade-up">
+  <h1>Ready to Make a Difference?</h1>
+  <h2>Join the movement and help clean India.</h2>
+    <p style="color: white;">
+    Whether you want to volunteer, report waste areas, or support our mission
+    — every action counts.
+  </p>
+
+  <div class="cta-actions">
+    <a href="signup.html" class="btn primary">Start Volunteering →</a>
+    <a href="donate.html" class="btn outline" style="text-decoration: none;">❤️ Donate to the Cause</a>
+    <a href="support.html" class="btn outline" style="text-decoration: none;">💚 Support Our Mission</a>
+  </div>
+
+  <!-- <div class="trust">
+    <span>🏛 NGO Registered</span>
+    <span>🔒 Secure Donations</span>
+    <span>✅ Tax Benefits (80G)</span>
+  </div> -->
+</section>
+
+<!-- ================= SLOGAN SECTION ================= -->
+<section class="slogan-section fade-up">
+  <div class="slogan-container">
+    <h2 class="slogan-main">Our Country, Our Responsibility</h2>
+    <div class="slogan-grid">
+      <p class="slogan-item">🌍 Clean India, Green India</p>
+      <p class="slogan-item">🤝 Together We Can Make a Difference</p>
+      <p class="slogan-item">💚 Every Action Counts</p>
+      <p class="slogan-item">🌟 Be the Change You Want to See</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer id="footer"></footer>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+  <div class="spinner"></div>
+  <p>Loading...</p>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- Enrollment Modal -->
+<div class="modal" id="enrollmentModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Enroll in Cleanup</h3>
+      <button class="close-modal" id="closeModal">&times;</button>
+    </div>
+    <div id="modalBody">
+      <!-- Content will be added dynamically -->
+    </div>
+  </div>
+</div>
+
+<script src="js/layout.js"></script>
+
+<!-- Main Functionality Script -->
+<script type="module">
+// Import Firebase modules
+import { auth, db } from './js/firebase.js';
+import { getCurrentUser } from './js/auth.js';
+import { getAllPosts, enrollInPost } from './js/posts.js';
+
+// Global state
+let currentUser = null;
+let allPosts = [];
+
+// DOM Elements
+const drivesContainer = document.getElementById('drivesContainer');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const enrollmentModal = document.getElementById('enrollmentModal');
+const closeModal = document.getElementById('closeModal');
+const modalBody = document.getElementById('modalBody');
+const donateBtn = document.getElementById('donateBtn');
+const toastContainer = document.getElementById('toastContainer');
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check if user is logged in
+  currentUser = await getCurrentUser();
+  
+  // Load drives
+  await loadDrives();
+  
+  // Initialize counter animation
+  initCounterAnimation();
+  
+  // Setup event listeners
+  setupEventListeners();
+});
+
+// Load drives from Firebase
+async function loadDrives() {
+  showLoading();
+  
+  try {
+    // Get all posts from Firebase (these are already filtered to approved posts)
+    allPosts = await getAllPosts();
+    
+    // Filter for cleanup posts with valid data, sorted by most recent
+    const activeDrives = allPosts.filter(post => {
+      // Only show posts that have required fields (title, location, etc.)
+      return post.title && post.location && post.isApproved === true;
+    }).sort((a, b) => {
+      // Sort by created date (most recent first)
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    }).slice(0, 3); // Show only 3 drives
+    
+    console.log(`Found ${activeDrives.length} active cleanup posts to display`);
+    
+    if (activeDrives.length === 0) {
+      // Show sample drives if no data
+      console.log('No active drives found, showing sample drives');
+      renderSampleDrives();
+    } else {
+      renderDrives(activeDrives);
+    }
+    
+    // Update hero metrics with real data
+    updateHeroMetrics(allPosts);
+    
+  } catch (error) {
+    console.error('Error loading drives:', error);
+    // Fallback to sample drives
+    renderSampleDrives();
+    showToast('Failed to load drives. Showing sample data.', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Render drives to the page
+function renderDrives(drives) {
+  drivesContainer.innerHTML = drives.map(drive => {
+    // Calculate progress safely
+    const enrolled = drive.enrolledCount || 0;
+    const required = drive.minRequired || 15;
+    const progress = Math.min(100, (enrolled / required) * 100);
+
+    // Determine if the current user is enrolled in this drive
+    const isEnrolled = currentUser && Array.isArray(drive.enrolledUsers) && drive.enrolledUsers.includes(currentUser.uid);
+    const isFull = enrolled >= (drive.maxAllowed || 30);
+
+    // Button state and label
+    let btnLabel = 'Enroll Now';
+    let btnDisabled = '';
+    let btnClass = 'primary-btn enroll-btn';
+
+    if (isEnrolled) {
+      btnLabel = 'Enrolled ✓';
+      btnDisabled = 'disabled';
+      btnClass = 'primary-btn enrolled';
+    } else if (isFull) {
+      btnLabel = 'Fully Booked';
+      btnDisabled = 'disabled';
+      btnClass = 'primary-btn full';
+    }
+
+    return `
+      <div class="drive-card" data-id="${drive.id}">
+        <img src="${drive.images && drive.images.length > 0 ? drive.images[0] : 'assets/drive1.jpg'}" 
+             alt="${drive.title || 'Cleanup Drive'}"
+             onerror="this.src='assets/drive1.jpg'" />
+        <h3>${drive.title || 'Cleanup Drive'}</h3>
+        <p class="location">📍 ${drive.location || 'Location TBA'}</p>
+        
+        <div class="progress">
+          <span>Volunteers</span>
+          <span>${enrolled}/${required}</span>
+        </div>
+        <div class="bar">
+          <div style="width: ${progress}%"></div>
+        </div>
+        
+        <button class="${btnClass}" 
+                data-id="${drive.id}"
+                ${btnDisabled}>
+          ${btnLabel}
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  // Add event listeners to enroll buttons
+  document.querySelectorAll('.enroll-btn').forEach(btn => {
+    btn.addEventListener('click', handleEnrollClick);
+  });
+}
+
+// Render sample drives (fallback)
+function renderSampleDrives() {
+  drivesContainer.innerHTML = `
+    <!-- CARD 1 -->
+    <div class="drive-card">
+      <img src="assets/drive1.jpg" />
+      <h3>Juhu Beach Cleanup</h3>
+      <p class="location">📍 Mumbai, Maharashtra</p>
+
+      <div class="progress">
+        <span>Volunteers</span>
+        <span id="volunteers1">12/15</span>
+      </div>
+      <div class="bar"><div id="progress1" style="width:80%"></div></div>
+
+      <button class="primary-btn" onclick="handleSampleEnroll(1)">Enroll Now</button>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="drive-card">
+      <img src="assets/drive2.jpg" />
+      <h3>Gomti River Bank</h3>
+      <p class="location">📍 Lucknow, UP</p>
+
+      <div class="progress">
+        <span>Volunteers</span>
+        <span id="volunteers2">15/15</span>
+      </div>
+      <div class="bar"><div id="progress2" style="width:100%"></div></div>
+
+      <button class="secondary-btn" onclick="showDriveDetails(2)">View Details</button>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="drive-card">
+      <img src="assets/drive3.jpg" />
+      <h3>Cubbon Park Drive</h3>
+      <p class="location">📍 Bangalore, Karnataka</p>
+
+      <div class="progress">
+        <span>Volunteers</span>
+        <span id="volunteers3">8/15</span>
+      </div>
+      <div class="bar"><div id="progress3" style="width:55%"></div></div>
+
+      <button class="primary-btn" onclick="handleSampleEnroll(3)">Enroll Now</button>
+    </div>
+  `;
+}
+
+// Handle enroll button click
+async function handleEnrollClick(event) {
+  const driveId = event.target.dataset.id;
+  const isScheduled = event.target.dataset.scheduled === 'true';
+  
+  // Check if user is logged in
+  if (!currentUser) {
+    showToast('Please login to enroll in cleanups', 'error');
+    setTimeout(() => {
+      window.location.href = 'login.html?redirect=index';
+    }, 1500);
+    return;
+  }
+  
+  try {
+    showLoading();
+    
+    // Call Firebase enroll function
+    const result = await enrollInPost(driveId);
+    
+    if (result.success) {
+      showToast('Successfully enrolled in cleanup!', 'success');
+      
+      // Update the UI
+      await loadDrives();
+      
+      // Show success modal
+      showEnrollmentSuccess(driveId, isScheduled);
+    } else {
+      showToast(result.error || 'Failed to enroll', 'error');
+    }
+  } catch (error) {
+    console.error('Enrollment error:', error);
+    showToast('Error enrolling. Please try again.', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Handle sample enroll (for demo)
+window.handleSampleEnroll = function(driveNumber) {
+  if (!currentUser) {
+    showToast('Please login to enroll in cleanups', 'error');
+    setTimeout(() => {
+      window.location.href = 'login.html?redirect=index';
+    }, 1500);
+    return;
+  }
+  
+  // Update volunteer count
+  const volunteerSpan = document.getElementById(`volunteers${driveNumber}`);
+  const progressBar = document.getElementById(`progress${driveNumber}`);
+  
+  if (volunteerSpan && progressBar) {
+    const currentText = volunteerSpan.textContent;
+    const [current, max] = currentText.split('/').map(Number);
+    
+    if (current < max) {
+      const newCount = current + 1;
+      volunteerSpan.textContent = `${newCount}/${max}`;
+      const newWidth = (newCount / max) * 100;
+      progressBar.style.width = `${newWidth}%`;
+      
+      // Show success message
+      showToast(`Enrolled! Now ${newCount}/${max} volunteers`, 'success');
+      
+      // If reached max, change button
+      if (newCount === max) {
+        const button = document.querySelector(`.drive-card:nth-child(${driveNumber}) .primary-btn`);
+        if (button) {
+          button.textContent = 'Fully Booked';
+          button.disabled = true;
+          button.style.background = '#6b7280';
+          
+          // Show scheduled message after 1 second
+          setTimeout(() => {
+            showToast('Drive has been scheduled! Check your dashboard.', 'info');
+          }, 1000);
+        }
+      }
+    } else {
+      showToast('This drive is fully booked!', 'error');
+    }
+  }
+};
+
+// Show drive details
+window.showDriveDetails = function(driveNumber) {
+  const driveTitles = [
+    'Juhu Beach Cleanup',
+    'Gomti River Bank',
+    'Cubbon Park Drive'
+  ];
+  
+  const locations = [
+    'Mumbai, Maharashtra',
+    'Lucknow, UP',
+    'Bangalore, Karnataka'
+  ];
+  
+  modalBody.innerHTML = `
+    <h4>${driveTitles[driveNumber - 1]}</h4>
+    <p><strong>Location:</strong> ${locations[driveNumber - 1]}</p>
+    <p><strong>Status:</strong> <span class="status scheduled">Scheduled</span></p>
+    <p><strong>Date:</strong> Next Saturday</p>
+    <p><strong>Time:</strong> 8:00 AM - 12:00 PM</p>
+    <p><strong>Meeting Point:</strong> Main Entrance</p>
+    <p><strong>What to bring:</strong> Gloves, water bottle, comfortable shoes</p>
+    <p><strong>Safety:</strong> Safety gear will be provided</p>
+    <br>
+    <button class="primary-btn" style="width: 100%;" onclick="handleSampleEnroll(${driveNumber})">
+      Join This Event
+    </button>
+  `;
+  
+  enrollmentModal.classList.add('active');
+};
+
+// Show enrollment success modal
+function showEnrollmentSuccess(driveId, isScheduled) {
+  const drive = allPosts.find(p => p.id === driveId);
+  if (!drive) return;
+  
+  modalBody.innerHTML = `
+    <div style="text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+      <h4>You're enrolled!</h4>
+      <p><strong>${drive.title}</strong></p>
+      <p>📍 ${drive.location}</p>
+      
+      ${isScheduled ? `
+        <div style="background: #dcfce7; padding: 15px; border-radius: 10px; margin: 20px 0;">
+          <p><strong>Event Scheduled!</strong></p>
+          <p>Date: ${drive.scheduledDate ? new Date(drive.scheduledDate).toLocaleDateString() : 'Next Saturday'}</p>
+          <p>Time: 8:00 AM - 12:00 PM</p>
+        </div>
+      ` : `
+        <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin: 20px 0;">
+          <p><strong>${drive.enrolledCount || 1}/${drive.minRequired || 15} volunteers enrolled</strong></p>
+          <p>Need ${(drive.minRequired || 15) - (drive.enrolledCount || 1)} more to schedule the cleanup</p>
+        </div>
+      `}
+      
+      <p>You'll receive email notifications about updates.</p>
+      <br>
+      <div style="display: flex; gap: 10px;">
+        <button class="primary-btn" style="flex: 1;" onclick="window.location.href='dashboard.html'">
+          View Dashboard
+        </button>
+        <button class="outline-btn" style="flex: 1;" onclick="enrollmentModal.classList.remove('active')">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  
+  enrollmentModal.classList.add('active');
+}
+
+// Update hero metrics with real data
+function updateHeroMetrics(posts) {
+  // Calculate metrics from posts
+  const totalCleanups = posts.filter(p => p.status === 'completed').length;
+  const totalVolunteers = posts.reduce((sum, post) => sum + (post.enrolledCount || 0), 0);
+  const uniqueAreas = new Set(posts.map(p => p.location)).size;
+  
+  // Update the numbers with animation
+  animateNumber('areasCleaned', totalCleanups || 524, '+');
+  animateNumber('totalVolunteers', totalVolunteers || 10234, '+');
+  animateNumber('eventsDone', totalCleanups || 200, '+');
+}
+
+// Animate number counting
+function animateNumber(elementId, target, suffix = '') {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  const current = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
+  const increment = Math.max(1, Math.floor((target - current) / 50));
+  let currentValue = current;
+  
+  const timer = setInterval(() => {
+    currentValue += increment;
+    if (currentValue >= target) {
+      element.textContent = target.toLocaleString() + suffix;
+      clearInterval(timer);
+    } else {
+      element.textContent = currentValue.toLocaleString() + suffix;
+    }
+  }, 20);
+}
+
+// Initialize counter animation
+function initCounterAnimation() {
+  const counters = document.querySelectorAll("[data-count]");
+  let fired = false;
+
+  const startCounter = () => {
+    if (fired) return;
+    fired = true;
+
+    counters.forEach(c => {
+      const target = +c.dataset.count;
+      let i = 0;
+      const step = Math.ceil(target / 120);
+
+      const timer = setInterval(() => {
+        i += step;
+        if (i >= target) {
+          c.innerText = target.toLocaleString() + "+";
+          clearInterval(timer);
+        } else {
+          c.innerText = i.toLocaleString();
+        }
+      }, 20);
+    });
+  };
+
+  // Start on scroll
+  window.addEventListener("scroll", () => {
+    const impact = document.querySelector(".impact");
+    if (impact && impact.getBoundingClientRect().top < window.innerHeight - 120) {
+      startCounter();
+    }
+  });
+
+  // Also start if already in view
+  const impact = document.querySelector(".impact");
+  if (impact && impact.getBoundingClientRect().top < window.innerHeight) {
+    startCounter();
+  }
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  // Modal close button
+  closeModal.addEventListener('click', () => {
+    enrollmentModal.classList.remove('active');
+  });
+
+  // Close modal when clicking outside
+  enrollmentModal.addEventListener('click', (e) => {
+    if (e.target === enrollmentModal) {
+      enrollmentModal.classList.remove('active');
+    }
+  });
+
+  // Donate button
+  if (donateBtn) {
+    donateBtn.addEventListener('click', () => {
+      showToast('Thank you for your interest in donating! We\'ll redirect you to our secure donation portal.', 'info');
+      // In a real app, this would redirect to payment gateway
+      setTimeout(() => {
+        window.open('https://donate.example.com', '_blank');
+      }, 2000);
+    });
+  }
+
+  // Listen for auth state changes
+  if (typeof auth !== 'undefined') {
+    auth.onAuthStateChanged((user) => {
+      currentUser = user;
+      console.log('Auth state changed:', user ? 'Logged in' : 'Logged out');
+    });
+  }
+}
+
+// Show loading overlay
+function showLoading() {
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'flex';
+  }
+}
+
+// Hide loading overlay
+function hideLoading() {
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
+  }
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll('.toast');
+  existingToasts.forEach(toast => {
+    toast.style.animation = 'slideOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  });
+
+  // Create new toast
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  // Add icon based on type
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️'
+  };
+  
+  toast.innerHTML = `${icons[type] || ''} ${message}`;
+  
+  toastContainer.appendChild(toast);
+  
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Make functions available globally for inline onclick handlers
+window.handleEnrollClick = handleEnrollClick;
+window.showToast = showToast;
+</script>
+
+<!-- REAL-TIME IMPACT STATS -->
+<script type="module">
+  import { db } from './js/firebase.js';
+  import { collection, getDocs, query, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  async function loadImpactStats() {
+      try {
+        // Load admin settings (base numbers). If `admin/settings` is protected
+        // by security rules, fall back to a public copy at `public/settings`.
+        let adminSettings = { baseAreasCount: 0, baseVolunteersCount: 0, baseWasteCount: 0, baseCitiesCount: 0 };
+
+        try {
+          const settingsRef = doc(db, "admin", "settings");
+          const settingsSnap = await getDoc(settingsRef);
+          if (settingsSnap.exists()) {
+            adminSettings = { ...adminSettings, ...settingsSnap.data() };
+            console.log('Loaded admin/settings for platform stats');
+          }
+        } catch (adminErr) {
+          // Likely permission denied for non-admin users — try public/settings
+          console.warn('Reading admin/settings failed, trying public/settings:', adminErr);
+          try {
+            const pubRef = doc(db, "public", "settings");
+            const pubSnap = await getDoc(pubRef);
+            if (pubSnap.exists()) {
+              adminSettings = { ...adminSettings, ...pubSnap.data() };
+              console.log('Loaded public/settings as fallback for platform stats');
+            } else {
+              console.log('No public/settings document found — using defaults');
+            }
+          } catch (pubErr) {
+            console.log('Using default admin settings');
+          }
+        }
+
+      // Get all posts to calculate stats
+      const postsRef = collection(db, "posts");
+      const postsSnapshot = await getDocs(query(postsRef));
+
+      let totalWaste = 0;
+      let uniqueVolunteers = new Set();
+      let uniqueCities = new Set();
+      let completedAreas = 0;
+
+      postsSnapshot.forEach(doc => {
+        const post = doc.data();
+
+        // Count waste collected from completed events
+        if (post.status === 'completed') {
+          completedAreas++;
+          totalWaste += post.wasteCollected || 0;
+        }
+
+        // Count unique volunteers
+        if (post.enrolledUsers && Array.isArray(post.enrolledUsers)) {
+          post.enrolledUsers.forEach(uid => uniqueVolunteers.add(uid));
+        }
+
+        // Count unique cities
+        if (post.location) {
+          uniqueCities.add(post.location);
+        }
+      });
+
+      // Update UI with real-time data
+      const wasteEl = document.getElementById('homeWasteCount');
+      const volunteersEl = document.getElementById('homeVolunteersCount');
+      const areasEl = document.getElementById('homeAreasCount');
+      const citiesEl = document.getElementById('homeCitiesCount');
+
+      if (wasteEl) wasteEl.textContent = (totalWaste + (adminSettings.baseWasteCount || 0)).toLocaleString();
+      if (volunteersEl) volunteersEl.textContent = (uniqueVolunteers.size + (adminSettings.baseVolunteersCount || 0)).toLocaleString();
+      if (areasEl) areasEl.textContent = (completedAreas + (adminSettings.baseAreasCount || 0)).toLocaleString();
+      if (citiesEl) citiesEl.textContent = (uniqueCities.size + (adminSettings.baseCitiesCount || 0)).toLocaleString();
+
+      // Animate numbers if visible
+      animateNumbers();
+
+    } catch (error) {
+      console.error("Error loading impact stats:", error);
+      // Set fallback values
+      document.getElementById('homeWasteCount').textContent = '15,000';
+      document.getElementById('homeVolunteersCount').textContent = '10,234';
+      document.getElementById('homeAreasCount').textContent = '524';
+      document.getElementById('homeCitiesCount').textContent = '50';
+    }
+  }
+
+  // Animate number counting effect
+  function animateNumbers() {
+    const targets = [
+      { el: document.getElementById('homeWasteCount'), speed: 50 },
+      { el: document.getElementById('homeVolunteersCount'), speed: 50 },
+      { el: document.getElementById('homeAreasCount'), speed: 50 },
+      { el: document.getElementById('homeCitiesCount'), speed: 50 }
+    ];
+
+    targets.forEach(({ el, speed }) => {
+      if (!el) return;
+      const targetValue = parseInt(el.textContent.replace(/,/g, ''));
+      let currentValue = 0;
+      const step = Math.ceil(targetValue / speed);
+
+      const timer = setInterval(() => {
+        currentValue += step;
+        if (currentValue >= targetValue) {
+          el.textContent = targetValue.toLocaleString() + '+';
+          clearInterval(timer);
+        } else {
+          el.textContent = currentValue.toLocaleString();
+        }
+      }, 20);
+    });
+  }
+
+  let statsLoaded = false;
+
+  // Load stats when impact section is scrolled into view
+  window.addEventListener("scroll", () => {
+    const impact = document.querySelector(".impact");
+    if (!statsLoaded && impact && impact.getBoundingClientRect().top < window.innerHeight - 120) {
+      statsLoaded = true;
+      loadImpactStats();
+    }
+  });
+
+  // Also load on page load if impact section is already visible
+  document.addEventListener("DOMContentLoaded", () => {
+    const impact = document.querySelector(".impact");
+    if (impact && impact.getBoundingClientRect().top < window.innerHeight) {
+      statsLoaded = true;
+      loadImpactStats();
+    }
+  });
+
+  // Listen for changes to `public/settings` so non-admin users see updates without a full reload
+  try {
+    const publicRef = doc(db, 'public', 'settings');
+    onSnapshot(publicRef, (snap) => {
+      if (!snap.exists()) return;
+      console.log('public/settings updated — refreshing impact stats');
+      // Force reload of stats so UI reflects new base values
+      statsLoaded = false;
+      // If impact section is visible, reload immediately; otherwise next scroll will trigger
+      const impact = document.querySelector('.impact');
+      if (impact && impact.getBoundingClientRect().top < window.innerHeight) {
+        statsLoaded = true;
+        loadImpactStats();
+      }
+    }, (err) => {
+      console.warn('public/settings listener error', err);
+    });
+  } catch (e) {
+    console.warn('Could not attach public/settings listener', e);
+  }
+</script>
+<script src="js/config.js" defer></script>
+<!-- Custom GenZcleaning Chat Widget -->
+<script src="js/chat-widget.js" defer></script>
+
+<!-- District selection modal for View All flow -->
+<div class="modal" id="indexDistrictModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Select a district</h3>
+      <button class="close-modal" id="closeIndexDistrictModal">&times;</button>
+    </div>
+    <div id="indexDistrictList" style="display:flex;flex-wrap:wrap;gap:10px;">
+    </div>
+    <div style="text-align:right;margin-top:12px;">
+      <button class="btn outline" id="indexDistrictSkip">Skip</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Build district list from allPosts and show modal
+  function extractDistrictsFromPostsIndex(posts) {
+    const set = new Set();
+    (posts || []).forEach(p => {
+      if (!p.location) return;
+      const parts = p.location.split(',').map(s => s.trim()).filter(Boolean);
+      const candidates = [];
+      if (parts.length > 1) candidates.push(parts[1]);
+      if (parts.length > 2) candidates.push(parts[2]);
+      candidates.push(parts[0]);
+      candidates.forEach(tok => {
+        if (!tok) return;
+        const cleaned = tok.replace(/\d+/g,'').replace(/India/i,'').trim();
+        if (cleaned.length > 2) set.add(cleaned);
+      });
+    });
+    return Array.from(set).slice(0,100).sort((a,b)=>a.localeCompare(b));
+  }
+
+  function showIndexDistrictModal(districts){
+    const modal = document.getElementById('indexDistrictModal');
+    const list = document.getElementById('indexDistrictList');
+    list.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.className = 'pill';
+    allBtn.textContent = 'All districts';
+    allBtn.onclick = () => { localStorage.setItem('selectedDistrict','all'); window.location.href = 'community.html'; };
+    list.appendChild(allBtn);
+    districts.forEach(d => {
+      const b = document.createElement('button');
+      b.className = 'pill';
+      b.textContent = d;
+      b.onclick = () => { localStorage.setItem('selectedDistrict', d); window.location.href = 'community.html'; };
+      list.appendChild(b);
+    });
+    setTimeout(()=> modal.classList.add('active'),10);
+    document.getElementById('closeIndexDistrictModal').onclick = ()=> modal.classList.remove('active');
+    document.getElementById('indexDistrictSkip').onclick = ()=> { localStorage.setItem('selectedDistrict','all'); window.location.href='community.html'; };
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('viewAllDrivesBtn');
+    if (!btn) return;
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      // Use allPosts if available, otherwise fetch minimal list and show generic
+      if (typeof allPosts !== 'undefined' && Array.isArray(allPosts) && allPosts.length>0) {
+        const districts = extractDistrictsFromPostsIndex(allPosts);
+        showIndexDistrictModal(districts);
+      } else {
+        // Fallback: go straight to community
+        window.location.href = 'community.html';
+      }
+    });
+  });
+</script>
+<!-- Custom GenZcleaning Chat Widget -->
+</body>
+</html>

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificate | GenZCleaning</title>
+  <!-- Google Fonts (from second code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Combined styles: first code layout + second code certificate design, with alignment refinements -->
+  <style>
+    /* ========== FIRST CODE LAYOUT RULES (adapted) ========== */
+    :root {
+      --cert-green: #14532d;
+      --cert-green-2: #16a34a;
+      --cert-overlay: rgba(20,83,45,0.55);
+      --cert-soft: #dcfce7;
+      --cert-ink: #1f2937;
+      --cert-muted: #4b7c5f;
+      --cert-paper: #ffffff;
+      --cert-frame: rgba(34,197,94,.35);
+      --deep-green: #1b5e20;
+      --mid-green: #2e7d32;
+      --leaf-green: #66bb6a;
+      --light-green: #a5d6a7;
+      --pale-green: #e8f5e9;
+      --gold: #c8a951;
+      --gold-light: #e8d5a3;
+      --gold-dark: #9a7a2e;
+      --cream: #faf8f3;
+      --paper: #f5f2ea;
+      --ink: #1a2e1c;
+      --muted: #4a6741;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #dde8dc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 20px 48px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .certificate-page {
+      max-width: 1280px;
+      margin: 24px auto 36px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* ===== TOPBAR (toolbar) – improved alignment ===== */
+    .topbar {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 18px 0 10px;
+      background: transparent;
+    }
+    .topbar-inner {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(16,118,62,0.06);
+      border: 1px solid rgba(27,94,32,0.1);
+      backdrop-filter: blur(6px);
+      flex-wrap: wrap;
+    }
+    @media (max-width: 600px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .topbar-left, .topbar-right {
+        justify-content: center;
+      }
+    }
+    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .topbar-center { display: flex; align-items: center; justify-content: center; flex: 1; }
+    .cert-status {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--muted);
+      font-size: 13px;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .back-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(27,94,32,0.12);
+      background: rgba(255,255,255,0.95);
+      color: var(--deep-green);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .back-pill:hover { box-shadow: 0 6px 18px rgba(27,94,32,0.08); transform: translateY(-2px); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .22s;
+      text-decoration: none;
+    }
+    .btn-outline {
+      background: rgba(255,255,255,.65);
+      color: var(--deep-green);
+      border: 1.5px solid rgba(27,94,32,.3);
+    }
+    .btn-outline:hover { background: #fff; border-color: var(--deep-green); }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #e8c96a 50%, var(--gold) 100%);
+      color: #3a2800;
+      box-shadow: 0 3px 12px rgba(200,169,81,.4);
+    }
+    .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(200,169,81,.5); }
+
+    /* Certificate outer wrap */
+    .cert-outer {
+      position: relative;
+      width: 100%;
+      max-width: 1180px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 12px;
+      animation: fadeUp .7s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Gold shimmer border */
+    .cert-border-ring {
+      position: absolute;
+      inset: -6px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold), #fff8e1, var(--gold), var(--gold-dark));
+      background-size: 300% 300%;
+      animation: shimmer 6s ease infinite;
+      z-index: 0;
+      opacity: .9;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .cert-border-inner {
+      position: absolute;
+      inset: 3px;
+      border-radius: 19px;
+      background: var(--paper);
+      z-index: 0;
+    }
+
+    /* The certificate itself – refined padding & spacing */
+    .certificate {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(180deg, #ffffff 0%, #faf9f4 18%, #f5f2e8 50%, #eef5ee 100%);
+      border-radius: 18px;
+      padding: 48px 56px 48px;
+      overflow: hidden;
+      aspect-ratio: 297 / 210;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      box-sizing: border-box;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Leaf watermark */
+    .cert-watermark {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: url('/assets/design.png') no-repeat center center;
+      background-size: 260px 260px;
+      opacity: 0.06;
+    }
+
+    /* Inner gold border */
+    .cert-inner-border {
+      position: absolute;
+      inset: 18px;
+      border: 1.5px solid;
+      border-image: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark)) 1;
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* RHS stamp – repositioned slightly */
+    .cert-stamp {
+      position: absolute;
+      top: 16px;
+      right: 30px;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .cert-stamp .stamp-img img {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      border: 5px solid var(--deep-green);
+      background: #fff;
+      display: block;
+    }
+    .cert-stamp .cert-id-pill {
+      background: linear-gradient(135deg, rgba(200,169,81,.12), rgba(200,169,81,.22));
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(200,169,81,.35);
+      font-size: 10px;
+      color: var(--gold-dark);
+    }
+
+    /* Corner ornaments (unchanged) */
+    .corner {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .corner svg { width: 100%; height: 100%; }
+    .corner-tl { top: 14px; left: 14px; }
+    .corner-tr { top: 14px; right: 14px; transform: scaleX(-1); }
+    .corner-bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+    .corner-br { bottom: 14px; right: 14px; transform: scale(-1,-1); }
+
+    /* Soft glow */
+    .cert-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(ellipse 55% 45% at 15% 12%, rgba(102,187,106,.13), transparent),
+                  radial-gradient(ellipse 40% 50% at 85% 80%, rgba(27,94,32,.09), transparent);
+    }
+
+    /* Main content – better vertical rhythm */
+    .cert-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+    }
+
+    /* Header */
+    .cert-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-top: 0;
+      padding-bottom: 10px;
+    }
+    .cert-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .cert-logo-wrap {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 14px rgba(27,94,32,.2);
+    }
+    .cert-logo-card {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 22px rgba(16,118,62,0.12);
+    }
+    .cert-small-logo { width:56px; height:auto; display:block; }
+    .cert-brand-text .org-name {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--deep-green);
+      letter-spacing: 1.5px;
+    }
+    .cert-brand-text .org-tagline {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .8px;
+      margin-top: 3px;
+      text-transform: uppercase;
+    }
+
+    /* Center block */
+    .cert-center {
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin: 8px 0;
+    }
+    .cert-presents {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 6px;
+    }
+    .cert-main-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 600;
+      color: var(--deep-green);
+      letter-spacing: 1.5px;
+      line-height: 1.1;
+      text-shadow: 0 2px 0 rgba(255,255,255,.85), 0 -1px 0 rgba(27,94,32,.12);
+    }
+
+    /* Divider with leaf */
+    .cert-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: min(480px, 70%);
+      margin: 12px auto 10px;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .divider-icon { color: var(--gold); font-size: 18px; line-height: 1; }
+
+    .cert-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .cert-presented-to {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .cert-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 4.5vw, 60px);
+      font-weight: 700;
+      color: var(--deep-green);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      line-height: 1;
+      padding: 8px 32px;
+      border-bottom: 3px solid;
+      border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+      margin-bottom: 12px;
+    }
+
+    .cert-body-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 600px;
+      margin-bottom: 12px;
+    }
+    .cert-badges {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cert-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .cert-badge-event {
+      background: rgba(27,94,32,.1);
+      color: var(--deep-green);
+      border: 1px solid rgba(27,94,32,.2);
+    }
+    .cert-badge-location {
+      background: rgba(200,169,81,.12);
+      color: var(--gold-dark);
+      border: 1px solid rgba(200,169,81,.3);
+    }
+
+    /* Footer */
+    .cert-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .cert-sign {
+      min-width: 200px;
+      flex: 1;
+    }
+    .sign-area {
+      height: 38px;
+      border-bottom: 1.5px solid rgba(27,94,32,.35);
+      width: 220px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .sign-area::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='38' viewBox='0 0 220 38'%3E%3Cpath d='M10 28 C30 10, 50 32, 70 22 C90 12, 100 30, 120 20 C140 10, 155 28, 175 18 C190 10, 205 24, 215 20' fill='none' stroke='%231b5e20' stroke-width='1.6' stroke-linecap='round' opacity='0.55'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center bottom;
+    }
+    .sign-name {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--deep-green);
+      letter-spacing: .8px;
+    }
+    .sign-role {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9.5px;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: .5px;
+    }
+
+    .cert-meta-box {
+      border: 1px solid rgba(200,169,81,.35);
+      background: rgba(250,248,243,.8);
+      border-radius: 10px;
+      padding: 12px 18px;
+      text-align: right;
+      backdrop-filter: blur(4px);
+      min-width: 200px;
+    }
+    .cert-meta-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .cert-meta-row:last-child { margin-bottom: 0; }
+    .cert-meta-row .meta-label {
+      font-weight: 600;
+      color: var(--deep-green);
+      letter-spacing: .5px;
+      font-size: 9.5px;
+      text-transform: uppercase;
+    }
+    .cert-meta-row .meta-val { font-weight: 500; }
+
+    /* Responsive refinements */
+    @media (max-width: 900px) {
+      .certificate { padding: 36px 32px; }
+      .cert-stamp { top: 12px; right: 20px; }
+      .cert-stamp .stamp-img img { width: 80px; height: 80px; }
+    }
+
+    @media (max-width: 768px) {
+      .certificate {
+        padding: 32px 24px;
+        aspect-ratio: auto;
+        min-height: 620px;
+      }
+      .cert-main-title { font-size: 32px; }
+      .cert-name { font-size: 28px; padding: 6px 20px; }
+      .cert-logo-wrap { width: 72px; height: 72px; }
+      .cert-logo-card { width: 64px; height: 64px; }
+      .cert-small-logo { width: 42px; }
+      .cert-stamp .stamp-img img { width: 68px; height: 68px; border-width: 4px; }
+      .cert-footer { flex-direction: column; align-items: center; text-align: center; }
+      .cert-meta-box { text-align: center; margin-top: 12px; width: 100%; }
+      .cert-sign { display: flex; flex-direction: column; align-items: center; }
+      .sign-area { width: 180px; }
+    }
+
+    @media (max-width: 480px) {
+      .certificate { padding: 20px 16px; }
+      .cert-main-title { font-size: 26px; }
+      .cert-name { font-size: 24px; padding: 6px 16px; }
+      .cert-header { flex-direction: column; gap: 12px; align-items: center; }
+      .cert-brand { justify-content: center; }
+      .cert-logo-wrap { width: 64px; height: 64px; }
+      .cert-logo-card { width: 56px; height: 56px; }
+      .cert-stamp { top: 8px; right: 16px; }
+      .cert-stamp .stamp-img img { width: 60px; height: 60px; }
+      .cert-badges { flex-direction: column; align-items: center; }
+    }
+
+    /* Print styles */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .topbar, #footer, .btn { display: none !important; }
+      .cert-outer { box-shadow: none; padding: 0; margin: 0; }
+      .certificate { box-shadow: none; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top header: back button + print/download actions -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <a href="dashboard.html" class="btn btn-outline back-pill">← Go Back</a>
+      </div>
+      <div class="topbar-center">
+        <div id="certStatus" class="cert-status" aria-live="polite">Loading...</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-gold" id="downloadPdfBtn">🖨 Save PDF</button>
+        <button class="btn btn-outline" id="downloadPngBtn">⬇️ Save PNG</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="certificate-page">
+    <div class="cert-outer" id="certOuter">
+      <div class="cert-border-ring"></div>
+      <div class="cert-border-inner"></div>
+
+      <div class="certificate" id="certificateNode">
+        <div class="cert-watermark" aria-hidden="true"></div>
+        <div class="cert-inner-border"></div>
+
+        <!-- Corner ornaments -->
+        <div class="corner corner-tl"><svg viewBox="0 0 48 48" fill="none" stroke="#c8a951" stroke-width="1.5"><path d="M5 5 L20 5 L20 20" stroke-linecap="round" /><circle cx="10" cy="10" r="2" fill="#c8a951" /></svg></div>
+        <div class="corner corner-tr"><svg viewBox="0 0 48 48" fill="none" stroke="#c8a951" stroke-width="1.5"><path d="M5 5 L20 5 L20 20" stroke-linecap="round" /><circle cx="10" cy="10" r="2" fill="#c8a951" /></svg></div>
+        <div class="corner corner-bl"><svg viewBox="0 0 48 48" fill="none" stroke="#c8a951" stroke-width="1.5"><path d="M5 5 L20 5 L20 20" stroke-linecap="round" /><circle cx="10" cy="10" r="2" fill="#c8a951" /></svg></div>
+        <div class="corner corner-br"><svg viewBox="0 0 48 48" fill="none" stroke="#c8a951" stroke-width="1.5"><path d="M5 5 L20 5 L20 20" stroke-linecap="round" /><circle cx="10" cy="10" r="2" fill="#c8a951" /></svg></div>
+        <div class="cert-glow"></div>
+
+        <!-- Main content -->
+        <div class="cert-content">
+          <!-- RHS stamp -->
+          <div class="cert-stamp" aria-hidden="true">
+            <div class="stamp-img"><img src="assets/stamp (2).png" alt="Seal" onerror="this.src='assets/design.png'"/></div>
+            <div class="cert-id-pill" id="certId">CERT-GZ-2025-001</div>
+          </div>
+
+          <!-- Header -->
+          <div class="cert-header">
+            <div class="cert-brand">
+              <div class="cert-logo-wrap">
+                <div class="cert-logo-card">
+                  <img src="assets/design.png" alt="GenZCleaning" class="cert-small-logo" onerror="this.src='assets/design.png'">
+                </div>
+              </div>
+              <div class="cert-brand-text">
+                <div class="org-name">GENZCLEANING</div>
+                <div class="org-tagline">Our Country, Our Responsibility</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center -->
+          <div class="cert-center">
+            <div class="cert-presents">GenZCleaning Proudly Presents</div>
+            <div class="cert-main-title">Certificate of Participation</div>
+
+            <div class="cert-divider" aria-hidden="true">
+              <div class="divider-line"></div>
+              <div class="divider-icon">🌿</div>
+              <div class="divider-line"></div>
+            </div>
+
+            <div class="cert-quote">"Alone we can do so little; together we can do so much."</div>
+
+            <div class="cert-presented-to">This Certificate is Proudly Presented to</div>
+            <div class="cert-name" id="certName">GenZcleaning</div>
+
+            <div class="cert-body-text">
+              For contributing to community cleaning efforts and making a meaningful difference<br>
+              in building a cleaner, healthier, and more sustainable environment for all.
+            </div>
+
+            <div class="cert-badges">
+              <span class="cert-badge cert-badge-event">
+                🍃 Event: <span id="certEvent">River Park Spring Cleanup Drive</span>
+              </span>
+              <span class="cert-badge cert-badge-location">
+                📍 Location: <span id="certLocation">Riverside Park, Metro City</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="cert-footer">
+            <div class="cert-sign">
+              <div class="sign-area"></div>
+              <div class="sign-name">GenZCleaning Team</div>
+              <div class="sign-role">Community Cleanup Platform · Authorized Representative</div>
+            </div>
+
+            <div class="cert-meta-box">
+              <div class="cert-meta-row">
+                <span class="meta-label">Date Issued</span>
+                <span class="meta-val" id="certDate">February 25, 2026</span>
+              </div>
+              <div class="cert-meta-row">
+                <span class="meta-label">Event ID</span>
+                <span class="meta-val" id="certPostId">EVT-2026-0225</span>
+              </div>
+              <div class="cert-meta-row">
+                <span class="meta-label">Verified</span>
+                <span class="meta-val" style="color:#2e7d32; font-weight:700;">✓ Official Record</span>
+              </div>
+            </div>
+          </div>
+        </div><!-- /cert-content -->
+      </div><!-- /certificate -->
+    </div><!-- /cert-outer -->
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/layout.js"></script>
+  <script src="js/vendor/html-renderer.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    (function() {
+      // Populate from URL params
+      const params = new URLSearchParams(location.search);
+      if (params.get('name')) document.getElementById('certName').textContent = params.get('name');
+      if (params.get('event')) document.getElementById('certEvent').textContent = params.get('event');
+      if (params.get('location')) document.getElementById('certLocation').textContent = params.get('location');
+      if (params.get('date')) document.getElementById('certDate').textContent = params.get('date');
+      if (params.get('postId')) document.getElementById('certPostId').textContent = params.get('postId');
+      if (params.get('certId')) document.getElementById('certId').textContent = params.get('certId');
+
+      document.getElementById('certStatus').textContent = 'Certificate ready';
+
+      const certNode = document.getElementById('certificateNode');
+
+      function showDownloadError(err, userMsg) {
+        console.error('Export error:', err);
+        if (confirm((userMsg || 'Export failed') + '\n\nOpen print dialog as fallback?')) {
+          window.print();
+        }
+      }
+
+      function enableImgsCORS(node) {
+        node.querySelectorAll('img').forEach(img => {
+          if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+        });
+      }
+
+      async function downloadPng() {
+        if (!window.html2canvas) {
+          if (confirm('PNG export requires html2canvas. Open print dialog?')) window.print();
+          return;
+        }
+        try {
+          enableImgsCORS(certNode);
+
+          // Render a landscape-sized clone so the saved PNG is always landscape
+          const exportWidth = 1180;
+          const exportHeight = Math.round(exportWidth * (210 / 297));
+
+          const clone = certNode.cloneNode(true);
+          clone.style.width = exportWidth + 'px';
+          clone.style.height = exportHeight + 'px';
+          clone.style.margin = '0';
+          clone.style.boxShadow = 'none';
+          clone.style.transform = 'none';
+
+          const wrapper = document.createElement('div');
+          wrapper.style.position = 'fixed';
+          wrapper.style.left = '-9999px';
+          wrapper.style.top = '0';
+          wrapper.style.width = exportWidth + 'px';
+          wrapper.style.height = exportHeight + 'px';
+          wrapper.style.overflow = 'hidden';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+
+          // Give browser a moment to layout off-screen content
+          await new Promise(r => setTimeout(r, 50));
+
+          const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            width: exportWidth,
+            height: exportHeight,
+            windowWidth: exportWidth,
+            windowHeight: exportHeight
+          });
+
+          const a = document.createElement('a');
+          a.download = 'GenZCleaning-Certificate.png';
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+
+          document.body.removeChild(wrapper);
+        } catch (err) {
+          showDownloadError(err, 'PNG export failed.');
+        }
+      }
+
+      async function downloadPdf() {
+        if (!window.jspdf || !window.html2canvas) {
+          if (confirm('PDF export requires jsPDF/html2canvas. Open print dialog?')) window.print();
+          return;
+        }
+        try {
+          enableImgsCORS(certNode);
+          const exportWidth = 1180;
+          const exportHeight = Math.round(exportWidth * (210 / 297));
+
+          const clone = certNode.cloneNode(true);
+          clone.style.width = exportWidth + 'px';
+          clone.style.height = exportHeight + 'px';
+          clone.style.margin = '0';
+          clone.style.boxShadow = 'none';
+          clone.style.transform = 'none';
+
+          const wrapper = document.createElement('div');
+          wrapper.style.position = 'fixed';
+          wrapper.style.left = '-9999px';
+          wrapper.style.top = '0';
+          wrapper.style.width = exportWidth + 'px';
+          wrapper.style.height = exportHeight + 'px';
+          wrapper.style.overflow = 'hidden';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+
+          await new Promise(r => setTimeout(r, 50));
+
+          const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            width: exportWidth,
+            height: exportHeight,
+            windowWidth: exportWidth,
+            windowHeight: exportHeight
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+          pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+          pdf.save('GenZCleaning-Certificate.pdf');
+
+          document.body.removeChild(wrapper);
+        } catch (err) {
+          showDownloadError(err, 'PDF export failed.');
+        }
+      }
+
+      document.getElementById('downloadPngBtn').addEventListener('click', downloadPng);
+      document.getElementById('downloadPdfBtn').addEventListener('click', downloadPdf);
+    })();
+  </script>
+  <script type="module" src="js/certificate.js"></script>
+</body>
+</html>

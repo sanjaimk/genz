@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Cleanups | GenZCleaning</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .simple-page {
+      max-width: 1100px;
+      margin: 100px auto 60px;
+      padding: 0 20px;
+    }
+    .simple-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .simple-toolbar .left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filters{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .pill{
+      border: 1px solid #d1fae5;
+      background: rgba(255,255,255,.65);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color:#14532d;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pill.active{
+      background: #dcfce7;
+      border-color: #86efac;
+      font-weight: 700;
+    }
+    /* Make card-header buttons consistent across dashboard pages */
+    .card-header .btn.view-all{
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header id="header"></header>
+  
+  <main class="dashboard-container">
+    
+    <!-- SIDEBAR PROFILE SECTION -->
+    <aside class="dashboard-sidebar slide-in-right">
+      <!-- PROFILE CARD -->
+      <section class="profile-card">
+        <div class="profile-avatar-wrapper">
+          <img id="user-avatar" src="https://i.pravatar.cc/150?img=12" alt="User" class="profile-avatar" />
+          <span class="rank-badge-large" id="user-rank">#23</span>
+        </div>
+
+        <h2 id="user-name" class="profile-name">
+          Loading...
+        </h2>
+        <span class="tag primary" id="user-role">Volunteer</span>
+
+        <p class="profile-location" id="user-meta">
+          📍 Loading location...
+        </p>
+
+        <div class="profile-stats-grid">
+          <div class="stat-item bounce-in" style="animation-delay: 0.1s;">
+            <div class="stat-value" id="user-points">0</div>
+            <div class="stat-label">Points</div>
+          </div>
+          <div class="stat-item bounce-in" style="animation-delay: 0.2s;">
+            <div class="stat-value" id="user-badges-count">0</div>
+            <div class="stat-label">Badges</div>
+          </div>
+          <div class="stat-item bounce-in" style="animation-delay: 0.3s;">
+            <div class="stat-value" id="user-cleanups-count">0</div>
+            <div class="stat-label">Cleanups</div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <a href="#" class="btn primary block small-btn">📅 Cleanups</a>
+          <a href="certificates.html" class="btn outline block small-btn">📜 Certificates</a>
+          <button class="btn ghost block small-btn" id="settings-btn">⚙️ Settings</button>
+        </div>
+      </section>
+
+      <!-- QUICK STATS CARD -->
+      <section class="quick-stats-card slide-in-right" style="animation-delay: 0.2s;">
+        <h4 class="quick-stats-title">Your Progress</h4>
+        
+        <div class="progress-item">
+          <label>Level 5</label>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 65%;"></div>
+          </div>
+          <span class="progress-text">650/1000 XP</span>
+        </div>
+      </section>
+    </aside>
+
+    <!-- MAIN CONTENT SECTION -->
+    <section class="dashboard-content">
+      
+      <!-- TOOLBAR & FILTERS -->
+      <div class="page-toolbar slide-in-down">
+        <div class="toolbar-left">
+          <a href="dashboard.html" class="btn outline small">← Dashboard</a>
+          <span id="pageStatus" style="color:#6b7280;">Loading your enrolled cleanups…</span>
+        </div>
+        <div class="filters" aria-label="Filters">
+          <button class="pill active" data-filter="all" type="button">All</button>
+          <button class="pill" data-filter="scheduled" type="button">Scheduled</button>
+          <button class="pill" data-filter="pending" type="button">Pending</button>
+          <button class="pill" data-filter="completed" type="button">Completed</button>
+          <button class="pill" data-filter="rejected" type="button">Rejected</button>
+        </div>
+      </div>
+
+      <!-- CLEANUPS CARD -->
+      <section class="card card-cleanups bounce-in">
+        <div class="card-header-premium">
+          <div class="header-badge">📅</div>
+          <div class="header-content">
+            <h3>Enrolled Cleanups</h3>
+            <p>Your upcoming and past cleanup events</p>
+          </div>
+        </div>
+        <div class="list" id="all-enrolled-cleanups-list">
+          <div class="loading">Loading cleanups...</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer id="footer"></footer>
+
+  <script src="js/layout.js"></script>
+  <script type="module" src="js/cleanups.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard | GenZCleaning</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 1200px; margin: 100px auto 40px; padding: 20px; }
+        .admin-header { margin-bottom: 40px; }
+        .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 32px; color: #22c55e; margin: 0; }
+        .stat-card p { color: #6b7280; margin: 5px 0 0; }
+        .admin-tabs { display: flex; gap: 10px; margin: 30px 0; flex-wrap: wrap; position: relative; z-index: 100; }
+        .admin-tab { padding: 12px 24px; background: #f0fdf4; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative; z-index: 100; pointer-events: auto; border: none; user-select: none; }
+        .admin-tab:hover { background: #dcfce7; }
+        .admin-tab.active { background: #22c55e; color: white; }
+        .tab-content { position: relative; z-index: 1; }
+        .tab-pane { margin-top: 20px; }
+        .pending-posts { margin-top: 30px; }
+        .post-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .post-header h4 { margin: 0; color: #14532d; }
+        .post-actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .post-images { margin: 15px 0; }
+        .users-list { display: grid; gap: 15px; margin-top: 20px; }
+        .user-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .user-info { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 250px; }
+        .user-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .user-details h4 { margin: 0; color: #14532d; }
+        .user-details p { margin: 5px 0 0; color: #6b7280; font-size: 14px; }
+        .volunteer-phone { color: #166534; text-decoration: none; font-weight: 600; }
+        .volunteer-phone:hover { text-decoration: underline; }
+        .volunteer-phone.muted { color: #9ca3af; font-weight: 500; }
+        .user-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; z-index: 10; position: relative; }
+        .user-actions button { position: relative; z-index: 11; pointer-events: auto; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .search-input { padding: 10px 15px; border: 2px solid #e5f5ea; border-radius: 10px; width: 300px; }
+        .empty-state { text-align: center; padding: 40px; color: #6b7280; }
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
+        .tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .tag.high { background: #fde68a; color: #92400e; }
+        .tag.critical { background: #fecaca; color: #991b1b; }
+        .tag.medium { background: #fef3c7; color: #92400e; }
+        .tag.low { background: #dcfce7; color: #166534; }
+        .settings-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .settings-card input { width: 100%; padding: 10px 15px; border: 2px solid #e5f5ea; border-radius: 10px; margin: 10px 0; }
+        
+        /* Before/After Cleanup Images Styling */
+        .before-after-container { 
+            display: flex; 
+            gap: 15px; 
+            margin: 15px 0; 
+            flex-wrap: wrap; 
+            align-items: flex-start; 
+        }
+        .before-after-item { 
+            text-align: center; 
+            flex: 1; 
+            min-width: 240px; 
+        }
+        .before-after-label { 
+            margin: 0 0 8px 0; 
+            color: #6b7280; 
+            font-size: 13px; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        .before-after-image { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            border: 2px solid #e5f5ea; 
+            display: block; 
+        }
+        .before-after-placeholder { 
+            width: 100%; 
+            height: 200px; 
+            background: #f0fdf4; 
+            border-radius: 8px; 
+            border: 2px solid #e5f5ea; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #9ca3af; 
+            font-size: 14px; 
+        }
+        
+        /* Cleanup Upload Box Styling */
+        .cleanup-upload-box {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin: 12px 0;
+            color: #166534;
+        }
+        .cleanup-upload-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .cleanup-upload-controls .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-stats { grid-template-columns: repeat(2, 1fr); }
+            .user-card { flex-direction: column; align-items: flex-start; }
+            .user-actions { width: 100%; margin-top: 15px; justify-content: flex-start; }
+            .search-input { width: 100%; }
+            .before-after-container { flex-direction: column; }
+            .before-after-item { min-width: 100%; }
+        }
+
+        /* ===== Admin Mobile UX Improvements ===== */
+        @media (max-width: 768px) {
+            .admin-container { margin: 80px auto 30px; padding: 12px; }
+            .admin-header h1 { font-size: 26px; }
+            .admin-header p { font-size: 14px; }
+
+            /* Tabs: swipe horizontally instead of wrapping */
+            .admin-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                gap: 8px;
+                padding-bottom: 6px;
+            }
+            .admin-tab {
+                flex: 0 0 auto;
+                white-space: nowrap;
+                padding: 10px 14px;
+                font-size: 13px;
+                border-radius: 12px;
+            }
+
+            /* Section headers: stack properly */
+            .section-header { flex-direction: column; align-items: stretch; }
+
+            /* Post actions: wrap buttons responsively */
+            .post-actions { 
+                flex-direction: row;
+                gap: 6px;
+                flex-wrap: wrap;
+                align-items: stretch;
+            }
+            .post-actions .btn { 
+                flex: 1 1 auto;
+                min-width: 70px;
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            
+            /* Cleanup upload section: mobile optimized */
+            .cleanup-upload-box {
+                padding: 10px 12px;
+                margin: 10px 0;
+                font-size: 13px;
+            }
+            .cleanup-upload-controls {
+                gap: 6px;
+                margin-top: 8px;
+            }
+            .cleanup-upload-controls .btn {
+                min-width: 100px;
+                padding: 7px 10px;
+                font-size: 12px;
+            }
+            
+            /* Post cards: tighter spacing */
+            .post-card {
+                padding: 14px;
+                margin-bottom: 12px;
+            }
+            .post-card h4 {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+            }
+            .post-card p {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+            
+            /* Post images: responsive sizing */
+            .post-images {
+                margin: 10px 0;
+            }
+            .post-images img {
+                max-width: 100%;
+                height: auto;
+                max-height: 180px;
+                border-radius: 10px;
+            }
+            
+            /* Tags: smaller font on mobile */
+            .tag {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+
+            /* Volunteers quick actions row: stack */
+            #volunteersTab button.btn { width: 100%; }
+        }
+
+        @media (max-width: 520px) {
+            .admin-stats { grid-template-columns: 1fr; }
+            .stat-card h3 { font-size: 28px; }
+        }
+
+        /* ===== Admin mobile: tighter layout ===== */
+        @media (max-width: 600px) {
+            .admin-container { margin: 72px 0 24px; padding: 10px 12px; max-width: 100%; }
+            .admin-header { margin-bottom: 20px; }
+            .admin-header h1 { font-size: 22px; }
+            .admin-header p { font-size: 13px; }
+            .admin-tabs { margin: 16px 0; padding-bottom: 8px; }
+            .tab-pane { margin-top: 12px; }
+            .section-header h2 { font-size: 18px; }
+            .search-input, #feedbackSearch, #userSearch, #feedbackCategoryFilter, #feedbackRatingFilter, #feedbackStatusFilter { width: 100% !important; max-width: 100%; }
+            .feedback-section .section-header { flex-direction: column; align-items: stretch; gap: 10px; }
+            #feedbackSummary { flex-direction: column; }
+            #feedbackSummary .settings-card { min-width: 100%; }
+            .user-card { padding: 14px; flex-direction: column; align-items: stretch; }
+            .user-info { min-width: 0; }
+            .user-actions { width: 100%; margin-top: 12px; justify-content: flex-start; flex-wrap: wrap; }
+            .user-actions .btn { flex: 1 1 auto; min-width: 120px; }
+            .post-card { padding: 14px; margin-bottom: 14px; }
+            .post-header { flex-wrap: wrap; gap: 8px; }
+            .post-actions .btn { width: 100% !important; }
+            #bulkRewardModal > div { width: 95%; max-width: none; margin: 10px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage posts, users, and platform settings</p>
+        </div>
+        
+        <div class="admin-stats">
+            <div class="stat-card">
+                <h3 id="areasCleanedCount">524+</h3>
+                <p>Areas Cleaned</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalVolunteersCount">10,234+</h3>
+                <p>Volunteers</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="eventsDoneCount">200+</h3>
+                <p>Events Done</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeEventsCount">0</h3>
+                <p>Active Events</p>
+            </div>
+        </div>
+        
+        <div class="admin-tabs">
+            <div class="admin-tab active" data-tab="pending" onclick="switchTab('pending')">📝 Pending Posts</div>
+            <div class="admin-tab" data-tab="community" onclick="switchTab('community')">🌍 Community Posts</div>
+            <div class="admin-tab" data-tab="volunteers" onclick="switchTab('volunteers')">👨‍👩‍👧‍👦 Volunteers</div>
+            <div class="admin-tab" data-tab="users" onclick="switchTab('users')">👥 Manage Users</div>
+            <div class="admin-tab" data-tab="feedback" onclick="switchTab('feedback')">💬 Feedback</div>
+            <div class="admin-tab" data-tab="reports" onclick="switchTab('reports')">⚠️ Reports</div>
+            <div class="admin-tab" data-tab="settings" onclick="switchTab('settings')">⚙️ Settings</div>
+            <div class="admin-tab" data-tab="cleanupProofs" onclick="switchTab('cleanupProofs')">🖼️ Cleanup Proofs</div>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Pending Posts Tab -->
+            <div class="tab-pane active" id="pendingTab">
+                <div class="pending-posts" id="pendingPosts">
+                    <div class="loading">Loading pending posts...</div>
+                </div>
+            </div>
+            
+            <!-- Community Posts Tab -->
+            <div class="tab-pane" id="communityTab" style="display: none;">
+                <div class="community-posts-section">
+                    <h2>Community Posts - Schedule Cleanups</h2>
+                    <div class="community-posts" id="communityPosts">
+                        <div class="loading">Loading community posts...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Volunteers Tab -->
+            <div class="tab-pane" id="volunteersTab" style="display: none;">
+                <div class="volunteers-section">
+                    <h2>Manage Event Volunteers</h2>
+                    <p style="color: #6b7280; margin-bottom: 20px;">Select a completed program to view and reward volunteers</p>
+                    
+                    <!-- Completed Programs List -->
+                    <div id="completedProgramsList" class="users-list" style="margin-bottom: 30px;">
+                        <div class="loading">Loading completed programs...</div>
+                    </div>
+                    
+                    <!-- Volunteers Panel (Hidden until a program is selected) -->
+                    <div id="volunteersPanel" style="display: none;">
+                        <div style="background: #f0fdf4; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                            <button class="btn outline" onclick="backToPrograms()" style="margin-bottom: 10px;">← Back to Programs</button>
+                            <h3 id="selectedProgramTitle">Program Title</h3>
+                            <p id="selectedProgramInfo" style="color: #6b7280; margin-top: 5px;"></p>
+                        </div>
+                        
+                        <!-- Reward Options -->
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <button class="btn primary" onclick="showBulkRewardModal()" style="flex: 1; min-width: 200px;">
+                                🎁 Bulk Reward All Volunteers
+                            </button>
+                            <button class="btn outline" onclick="switchRewardMode('individual')" id="individualModeBtn" style="flex: 1; min-width: 200px;">
+                                ⭐ Individual Reward Mode
+                            </button>
+                            <button class="btn outline" onclick="issueCertificatesForAll()" style="flex: 1; min-width: 200px;">
+                                📜 Issue Certificates (All)
+                            </button>
+                        </div>
+                        
+                        <!-- Volunteers List -->
+                        <div id="volunteersContainer" class="users-list">
+                            <div class="loading">Loading volunteers...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Tab -->
+            <div class="tab-pane" id="usersTab" style="display: none;">
+                <div class="users-section">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                    </div>
+                    <div id="usersList" class="users-list">
+                        <div class="loading">Loading users...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div class="tab-pane" id="feedbackTab" style="display: none;">
+                <div class="feedback-section">
+                    <div class="section-header">
+                        <h2>User Feedback & Reviews</h2>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <input type="text" id="feedbackSearch" placeholder="Search feedback..." class="search-input" style="width: 280px;">
+                            <select id="feedbackCategoryFilter" class="search-input" style="width: 180px;">
+                                <option value="">All categories</option>
+                                <option value="bug">Bug</option>
+                                <option value="feature">Feature request</option>
+                                <option value="general">General</option>
+                                <option value="appreciation">Appreciation</option>
+                            </select>
+                            <select id="feedbackRatingFilter" class="search-input" style="width: 160px;">
+                                <option value="">All ratings</option>
+                                <option value="5">5★</option>
+                                <option value="4">4★</option>
+                                <option value="3">3★</option>
+                                <option value="2">2★</option>
+                                <option value="1">1★</option>
+                            </select>
+                            <select id="feedbackStatusFilter" class="search-input" style="width: 160px;">
+                                <option value="">All status</option>
+                                <option value="open">Open</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="feedbackSummary" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 14px;">
+                        <div class="settings-card" style="flex:1; min-width: 220px; margin-bottom: 0;">
+                            <div style="color:#6b7280;">Total reviews</div>
+                            <div style="font-size:28px; font-weight:800; color:#14532d;" id="fbTotal">0</div>
+                        </div>
+                        <div class="settings-card" style="flex:1; min-width: 220px; margin-bottom: 0;">
+                            <div style="color:#6b7280;">Average rating</div>
+                            <div style="font-size:28px; font-weight:800; color:#14532d;" id="fbAvg">—</div>
+                        </div>
+                        <div class="settings-card" style="flex:1; min-width: 220px; margin-bottom: 0;">
+                            <div style="color:#6b7280;">Open</div>
+                            <div style="font-size:28px; font-weight:800; color:#14532d;" id="fbOpen">0</div>
+                        </div>
+                    </div>
+
+                    <div id="feedbackList" class="users-list">
+                        <div class="loading">Loading feedback...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div class="tab-pane" id="reportsTab" style="display: none;">
+                <div class="reports-section">
+                    <h2>Reported Issues</h2>
+                    <div id="reportsList" class="reports-list">
+                        <div class="loading">Loading reports...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div class="tab-pane" id="settingsTab" style="display: none;">
+                <div class="settings-section">
+                    <h2>Admin Settings</h2>
+                    
+                    <div class="settings-card">
+                        <h3>🎖️ Badge & Rewards Settings</h3>
+                        <div style="margin-bottom: 20px;">
+                            <label><strong>Badges to Award Per Completed Event:</strong></label>
+                            <input type="number" id="badgesPerEvent" min="1" max="10" style="width: 100%; padding: 10px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px;">
+                            <button class="btn primary small" onclick="saveBadgeSettings()" style="width: auto; margin-top: 10px;">Save Badge Settings</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>📊 Platform Statistics</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label><strong>Base Areas Cleaned:</strong></label>
+                                <input type="number" id="baseAreasCount" min="0" style="width: 100%; padding: 10px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px;">
+                            </div>
+                            <div>
+                                <label><strong>Base Volunteers Count:</strong></label>
+                                <input type="number" id="baseVolunteersCount" min="0" style="width: 100%; padding: 10px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px;">
+                            </div>
+                            <div>
+                                <label><strong>Base Waste Collected (kg):</strong></label>
+                                <input type="number" id="baseWasteCount" min="0" style="width: 100%; padding: 10px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px;">
+                            </div>
+                            <div>
+                                <label><strong>Base Events Done:</strong></label>
+                                <input type="number" id="baseEventsCount" min="0" style="width: 100%; padding: 10px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px;">
+                            </div>
+                        </div>
+                        <button class="btn primary small" onclick="savePlatformStats()" style="width: auto; margin-top: 20px;">Save Platform Statistics</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cleanup Proofs Tab -->
+            <div class="tab-pane" id="cleanupProofsTab" style="display: none;">
+                <div class="section-header">
+                    <h2>Cleanup Proofs — Review After Images</h2>
+                    <input type="text" id="cleanupSearch" placeholder="Search by title or location..." class="search-input">
+                </div>
+                <div id="cleanupProofs" class="users-list">
+                    <div class="loading">Loading cleanup proofs...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bulk Reward Modal -->
+    <!-- NOTE: keep display:none by default; it is toggled via JS -->
+    <div id="bulkRewardModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 style="margin-top: 0;">Bulk Reward All Volunteers</h3>
+            <p style="color: #6b7280;">Award the same points and/or badges to all volunteers</p>
+            
+            <div style="margin: 20px 0;">
+                <label><strong>📊 Points to Award (optional):</strong></label>
+                <input type="number" id="bulkPoints" placeholder="e.g., 150" min="0" max="1000" style="width: 100%; padding: 10px 15px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px; box-sizing: border-box;">
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label><strong>🏅 Badge Name (optional):</strong></label>
+                <input type="text" id="bulkBadgeName" placeholder="e.g., Cleanup Hero, Outstanding Volunteer" style="width: 100%; padding: 10px 15px; border: 2px solid #e5f5ea; border-radius: 10px; margin-top: 8px; box-sizing: border-box;">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <button class="btn outline" onclick="closeBulkRewardModal()" style="width: 100%;">Cancel</button>
+                <button class="btn primary" onclick="executeBulkReward()" style="width: 100%;">Apply to All</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="footer"></div>
+    
+    <!-- Enrolled Users Modal -->
+    <div id="enrolledModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1100; justify-content:center; align-items:center;">
+        <div style="background:white; width:92%; max-width:720px; border-radius:12px; padding:18px; box-shadow:0 20px 50px rgba(0,0,0,0.3); max-height:80vh; overflow:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <h3 id="enrolledModalTitle" style="margin:0;">Enrolled Volunteers</h3>
+                <button class="btn outline" onclick="closeEnrolledModal()">Close</button>
+            </div>
+            <div id="enrolledModalBody" style="margin-top:12px; display:grid; gap:12px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Placeholder functions that will be overwritten by the module
+        window.switchTab = function(tabName) {
+            console.log('Waiting for module to load...', tabName);
+        };
+        window.awardPoints = function() { console.log('Waiting for module...'); };
+        window.awardBadge = function() { console.log('Waiting for module...'); };
+        window.markCleanupDone = function() { console.log('Waiting for module...'); };
+        window.markEventComplete = function() { console.log('Waiting for module...'); };
+        window.saveBadgeSettings = function() { console.log('Waiting for module...'); };
+        window.savePlatformStats = function() { console.log('Waiting for module...'); };
+        window.approvePost = function() { console.log('Waiting for module...'); };
+        window.rejectPost = function() { console.log('Waiting for module...'); };
+        window.deleteCommunityPost = function() { console.log('Waiting for module...'); };
+        window.scheduleCommunityCleanup = function() { console.log('Waiting for module...'); };
+    </script>
+    <!-- Offscreen render root for certificate generation -->
+    <div id="certificateRenderRoot" style="position: fixed; left: -99999px; top: 0; width: 100%; max-width: 1200px; pointer-events: none;"></div>
+
+    <script src="js/layout.js"></script>
+    <!-- Needed for certificate image generation (html-to-image / html2canvas fallback) -->
+    <script src="js/vendor/html-renderer.js"></script>
+    <script type="module" src="js/admin.js"></script>
+    <!-- Custom GenZcleaning Chat Widget -->
+    <script src="js/chat-widget.js"></script>
+</body>
+</html>

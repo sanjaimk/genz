@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Notifications | GenZCleaning</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .notifications-page {
+      max-width: 900px;
+      margin: 100px auto 60px;
+      padding: 0 20px;
+    }
+
+    .notifications-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .notifications-header h1 {
+      color: #166534;
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .notification-item {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #22c55e;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .notification-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .notification-item.read {
+      opacity: 0.7;
+      border-left-color: #d1d5db;
+    }
+
+    .notification-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .notification-message {
+      flex: 1;
+    }
+
+    .notification-message p {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .notification-time {
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      background: #f0fdf4;
+      border: 1px solid #d1fae5;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #166534;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      background: #dcfce7;
+      border-color: #bbf7d0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: #f8fff9;
+      border-radius: 12px;
+    }
+
+    .empty-state h2 {
+      color: #166534;
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: #6b7280;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #d1fae5;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .filter-tab.active {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #166534;
+    }
+
+    .filter-tab:hover {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      .notifications-page {
+        margin-top: 80px;
+      }
+
+      .notification-content {
+        flex-direction: column;
+      }
+
+      .notification-actions {
+        width: 100%;
+      }
+
+      .btn-small {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="header"></header>
+
+  <main class="page-content notifications-page">
+    <div class="notifications-header">
+      <h1>🔔 All Notifications</h1>
+      <button id="markAllReadBtn" class="btn outline small" style="padding: 10px 16px;">Mark all as read</button>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="unread">Unread</button>
+      <button class="filter-tab" data-filter="events">Events</button>
+      <button class="filter-tab" data-filter="certificates">Certificates</button>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notificationsList">
+      <div class="loading-spinner">Loading notifications...</div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer"></footer>
+
+  <!-- Scripts -->
+  <script src="js/layout.js" defer></script>
+
+  <script type="module">
+    import { db, auth } from './js/firebase.js';
+    import { collection, query, where, getDocs, orderBy, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    let allNotifications = [];
+    let currentUser = null;
+    let currentFilter = 'all';
+
+    // Check authentication
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html?redirect=notifications';
+        return;
+      }
+
+      currentUser = user;
+      
+      // Set up event delegation ONCE - with stopPropagation at the source
+      const container = document.getElementById('notificationsList');
+      container.addEventListener('click', function(event) {
+        // Prevent any default and propagation
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const target = event.target;
+        
+        // Mark as read button
+        if (target.classList.contains('mark-read')) {
+          const notifItem = target.closest('[data-id]');
+          if (notifItem) {
+            const notifId = notifItem.dataset.id;
+            console.log('Mark read clicked for:', notifId);
+            handleMarkAsRead(notifId);
+          }
+          return;
+        }
+        
+        // Delete button
+        if (target.classList.contains('delete-notif')) {
+          const notifItem = target.closest('[data-id]');
+          if (notifItem) {
+            const notifId = notifItem.dataset.id;
+            console.log('Delete clicked for:', notifId);
+            handleDeleteNotification(notifId);
+          }
+          return;
+        }
+      }, true); // Use capture phase
+      
+      await loadNotifications();
+    });
+
+    // Load all notifications
+    async function loadNotifications() {
+      const container = document.getElementById('notificationsList');
+      container.innerHTML = '<div class="loading-spinner">Loading notifications...</div>';
+
+      try {
+        const notifRef = collection(db, "notifications");
+        const q = query(notifRef, where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        allNotifications = [];
+        snapshot.forEach((docSnap) => {
+          allNotifications.push({
+            id: docSnap.id,
+            ...docSnap.data()
+          });
+        });
+
+        if (allNotifications.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h2>No Notifications Yet</h2>
+              <p>You'll see notifications here about events, certificates, and more.</p>
+            </div>
+          `;
+          return;
+        }
+
+        renderNotifications();
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        container.innerHTML = '<div class="empty-state"><h2>Error</h2><p>Unable to load notifications. Please try again.</p></div>';
+      }
+    }
+
+    // Render notifications based on filter
+    function renderNotifications() {
+      const container = document.getElementById('notificationsList');
+      
+      let filtered = allNotifications;
+      
+      if (currentFilter === 'unread') {
+        filtered = allNotifications.filter(n => n.read !== true);
+      } else if (currentFilter === 'events') {
+        filtered = allNotifications.filter(n => n.type === 'event' || n.message?.includes('Event'));
+      } else if (currentFilter === 'certificates') {
+        filtered = allNotifications.filter(n => n.type === 'certificate' || n.message?.includes('certificate'));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h2>No Notifications</h2><p>No notifications found for this filter.</p></div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map((notif) => {
+        const timestamp = notif.createdAt?.toDate ? notif.createdAt.toDate() : new Date(notif.createdAt);
+        const timeAgo = formatTimeAgo(timestamp);
+        const isRead = notif.read === true;
+        const message = notif.message?.trim() || notif.data?.message?.trim();
+        
+        // Skip notifications with empty messages
+        if (!message) {
+          return '';
+        }
+
+        return `
+          <div class="notification-item ${isRead ? 'read' : ''}" data-id="${notif.id}">
+            <div class="notification-content">
+              <div class="notification-message">
+                <p>${message}</p>
+                <div class="notification-time">${timeAgo}</div>
+              </div>
+              <div class="notification-actions">
+                ${!isRead ? `<button class="btn-small mark-read">Mark read</button>` : ''}
+                <button class="btn-small delete-notif">Delete</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).filter(html => html !== '').join('');
+    }
+
+    // Mark as read handler
+    function handleMarkAsRead(notifId) {
+      if (!notifId || typeof notifId !== 'string') {
+        console.error('Invalid notification ID');
+        return;
+      }
+      
+      const notifRef = doc(db, "notifications", notifId);
+      updateDoc(notifRef, { read: true }).then(function() {
+        console.log('Marked as read:', notifId);
+        loadNotifications();
+      }).catch(function(error) {
+        console.error('Error marking as read:', error);
+        alert('Error: ' + error.message);
+      });
+    }
+
+    // Delete handler - NO EVENT OBJECT, ONLY ID
+    function handleDeleteNotification(notifId) {
+      console.log('=== HANDLING DELETE ===');
+      console.log('NotifId type:', typeof notifId);
+      console.log('NotifId value:', notifId);
+      
+      if (!notifId || typeof notifId !== 'string') {
+        console.error('Invalid notification ID');
+        alert('Error: Invalid notification ID');
+        return;
+      }
+      
+      if (!currentUser) {
+        console.error('User not authenticated');
+        alert('You must be logged in');
+        return;
+      }
+      
+      const notifRef = doc(db, "notifications", notifId);
+      console.log('Deleting:', notifRef.path);
+      
+      deleteDoc(notifRef).then(function() {
+        console.log('Successfully deleted');
+        allNotifications = allNotifications.filter(function(n) {
+          return n.id !== notifId;
+        });
+        renderNotifications();
+      }).catch(function(error) {
+        console.error('Delete error:', error);
+        if (error.code === 'permission-denied') {
+          alert('Permission denied: Check Firestore rules');
+        } else {
+          alert('Error: ' + error.message);
+        }
+      });
+    }
+
+    // Keep old window functions for compatibility
+    window.markAsRead = function(notifId) {
+      handleMarkAsRead(notifId);
+    };
+
+    window.deleteNotification = function(notifId) {
+      handleDeleteNotification(notifId);
+    };
+
+    // Mark all as read
+    document.getElementById('markAllReadBtn').addEventListener('click', async () => {
+      try {
+        for (const notif of allNotifications) {
+          if (notif.read !== true) {
+            const notifRef = doc(db, "notifications", notif.id);
+            await updateDoc(notifRef, { read: true });
+          }
+        }
+        await loadNotifications();
+      } catch (error) {
+        console.error('Error marking all as read:', error);
+      }
+    });
+
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        renderNotifications();
+      });
+    });
+
+    // Format time
+    function formatTimeAgo(date) {
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return diffMins + 'm ago';
+      if (diffHours < 24) return diffHours + 'h ago';
+      if (diffDays < 7) return diffDays + 'd ago';
+      return date.toLocaleDateString();
+    }
+  </script>
+
+  <!-- Custom GenZcleaning Chat Widget -->
+  <script src="js/chat-widget.js"></script>
+</body>
+</html>

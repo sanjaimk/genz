@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Complete Your Profile | GenZcleaning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="header"></header>
+
+  <div class="auth-wrapper">
+    <div class="auth-section">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <div class="auth-logo">📱</div>
+          
+          <h2 class="mb-2">Almost There!</h2>
+          <p class="mb-4">We need your phone number to reach you for cleanups and coordination.</p>
+
+          <form onsubmit="handlePhoneSubmit(event)">
+            <div class="form-group mb-4">
+              <label for="phone" class="form-label">
+                Phone Number <span class="text-danger">*</span>
+              </label>
+              <input 
+                id="phone" 
+                type="tel" 
+                placeholder="+1 234 567 8900" 
+                autocomplete="tel"
+                required
+                class="form-control"
+              />
+              <small class="text-muted d-block mt-2">
+                Admins and organizers use this to call you if a cleanup is starting.
+              </small>
+            </div>
+
+            <button type="submit" class="btn primary block mb-3" id="save-phone-btn">
+              Save &amp; Continue
+            </button>
+
+            <p id="profile-complete-error" class="text-danger text-sm" style="display: none;"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/layout.js"></script>
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/profile-complete.js"></script>
+</body>
+</html>
